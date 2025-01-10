@@ -17,24 +17,39 @@ public class RetensionBasinApp extends JFrame {
         setTitle("Retension Basin Configuration");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(8, 2));
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
 
         // Host input
-        add(new JLabel("Host:"));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(new JLabel("Host:"), gbc);
+        gbc.gridx = 1;
         hostInput = new JTextField("localhost");
-        add(hostInput);
+        add(hostInput, gbc);
 
         // Port input
-        add(new JLabel("Port:"));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(new JLabel("Port:"), gbc);
+        gbc.gridx = 1;
         portInput = new JTextField("8081");
-        add(portInput);
+        add(portInput, gbc);
 
         // Max Volume input
-        add(new JLabel("Max Volume:"));
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        add(new JLabel("Max Volume:"), gbc);
+        gbc.gridx = 1;
         maxVolumeInput = new JTextField("1000");
-        add(maxVolumeInput);
+        add(maxVolumeInput, gbc);
 
         // Start button
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
         JButton startButton = new JButton("Start Retension Basin");
         startButton.addActionListener(new ActionListener() {
             @Override
@@ -47,19 +62,30 @@ public class RetensionBasinApp extends JFrame {
                 updateParameters();
             }
         });
-        add(startButton);
+        add(startButton, gbc);
+
 
         // Filling Percentage label
-        add(new JLabel("Filling Percentage:"));
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.gridwidth = 1;
+        add(new JLabel("Filling Percentage:"), gbc);
+        gbc.gridx = 1;
         fillingPercentageLabel = new JLabel("N/A");
-        add(fillingPercentageLabel);
+        add(fillingPercentageLabel, gbc);
 
         // Water Discharge label
-        add(new JLabel("Water Discharge:"));
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        add(new JLabel("Water Discharge:"), gbc);
+        gbc.gridx = 1;
         waterDischargeLabel = new JLabel("N/A");
-        add(waterDischargeLabel);
+        add(waterDischargeLabel, gbc);
 
         // Refresh button
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 2;
         JButton refreshButton = new JButton("Refresh Parameters");
         refreshButton.addActionListener(new ActionListener() {
             @Override
@@ -67,7 +93,7 @@ public class RetensionBasinApp extends JFrame {
                 updateParameters();
             }
         });
-        add(refreshButton);
+        add(refreshButton, gbc);
 
         setVisible(true);
     }
