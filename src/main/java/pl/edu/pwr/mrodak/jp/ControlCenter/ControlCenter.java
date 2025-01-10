@@ -12,9 +12,15 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class ControlCenter implements IControlCenter {
+    private String host;
+    private int port;
     private Map<Integer, String> retensionBasins = new HashMap<>();
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
+    public ControlCenter(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
     @Override
     public void assignRetensionBasin(int port, String host) {
         retensionBasins.put(port, host);
