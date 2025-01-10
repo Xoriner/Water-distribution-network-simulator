@@ -33,7 +33,7 @@ public class ControlCenterApp extends JFrame {
                 String host = hostInput.getText();
                 int port = Integer.parseInt(portInput.getText());
 
-                ControlCenter controlCenter = new ControlCenter();
+                IControlCenter controlCenter = new ControlCenter();
                 controlCenter.assignRetensionBasin(port, host);
                 controlCenter.monitorBasins();
             }

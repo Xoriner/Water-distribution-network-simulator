@@ -9,13 +9,9 @@ public class RetensionBasin implements IRetensionBasin {
     private int currentVolume;
     private int waterDischarge;
     private Map<Integer, Integer> waterInflows = new HashMap<>();
-    private String controlCenterHost;
-    private int controlCenterPort;
 
-    public RetensionBasin(int maxVolume, int port, String controlCenterHost, int controlCenterPort) {
+    public RetensionBasin(int maxVolume, int port) {
         this.maxVolume = maxVolume;
-        this.controlCenterHost = controlCenterHost;
-        this.controlCenterPort = controlCenterPort;
         // Start server socket to listen for incoming connections
         new Thread(() -> startServer(port)).start();
     }
@@ -49,7 +45,9 @@ public class RetensionBasin implements IRetensionBasin {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
                 try (Socket clientSocket = serverSocket.accept();
-                     BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                     InputStream InputStream = clientSocket.getInputStream();
+                     InputStreamReader InputStreamReader = new InputStreamReader(InputStream);
+                     BufferedReader in = new BufferedReader(InputStreamReader);
                      PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
                     String request = in.readLine();
                     String response = handleRequest(request);
@@ -61,9 +59,28 @@ public class RetensionBasin implements IRetensionBasin {
         }
     }
 
+    // Request Handling
     private String handleRequest(String request) {
-        if ("GET_STATUS".equals(request)) {
-            return "Status: OK, Max Volume: " + maxVolume + ", Current Volume: " + currentVolume;
+        if ("gwd".equals(request)) {
+            return String.valueOf(getWaterDischarge());
+        } else if ("gfp".equals(request)) {
+            return String.valueOf(getFillingPercentage());
+        } else if (request.startsWith("swd:")) {
+            int waterDischarge = Integer.parseInt(request.substring(4));
+            setWaterDischarge(waterDischarge);
+            return "0";
+        } else if (request.startsWith("swi:")) {
+            String[] parts = request.substring(4).split(",");
+            int waterInflow = Integer.parseInt(parts[0]);
+            int port = Integer.parseInt(parts[1]);
+            setWaterInflow(waterInflow, port);
+            return "0";
+        } else if (request.startsWith("arb:")) {
+            String[] parts = request.substring(4).split(",");
+            int port = Integer.parseInt(parts[0]);
+            String host = parts[1];
+            assignRiverSection(port, host);
+            return "0";
         }
         return "Unknown request";
     }

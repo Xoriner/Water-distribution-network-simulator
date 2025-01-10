@@ -25,7 +25,7 @@ public class ControlCenter implements IControlCenter {
             for (Map.Entry<Integer, String> entry : retensionBasins.entrySet()) {
                 int port = entry.getKey();
                 String host = entry.getValue();
-                String status = sendRequest(host, port, "GET_STATUS");
+                String status = sendRequest(host, port, "gfp");
                 if (status != null) {
                     System.out.println("Status of basin at " + host + ":" + port + " - " + status);
                 } else {

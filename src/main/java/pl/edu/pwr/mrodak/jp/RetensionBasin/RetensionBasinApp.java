@@ -9,14 +9,15 @@ public class RetensionBasinApp extends JFrame {
     private JTextField hostInput;
     private JTextField portInput;
     private JTextField maxVolumeInput;
-    private JTextField ccHostInput;
-    private JTextField ccPortInput;
+    private JLabel fillingPercentageLabel;
+    private JLabel waterDischargeLabel;
+    private IRetensionBasin retensionBasin;
 
     public RetensionBasinApp() {
         setTitle("Retension Basin Configuration");
-        setSize(400, 300);
+        setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new GridLayout(6, 2));
+        setLayout(new GridLayout(8, 2));
 
         // Host input
         add(new JLabel("Host:"));
@@ -33,16 +34,6 @@ public class RetensionBasinApp extends JFrame {
         maxVolumeInput = new JTextField("1000");
         add(maxVolumeInput);
 
-        // Control Center Host input
-        add(new JLabel("Control Center Host:"));
-        ccHostInput = new JTextField("localhost");
-        add(ccHostInput);
-
-        // Control Center Port input
-        add(new JLabel("Control Center Port:"));
-        ccPortInput = new JTextField("9090");
-        add(ccPortInput);
-
         // Start button
         JButton startButton = new JButton("Start Retension Basin");
         startButton.addActionListener(new ActionListener() {
@@ -51,15 +42,41 @@ public class RetensionBasinApp extends JFrame {
                 String host = hostInput.getText();
                 int port = Integer.parseInt(portInput.getText());
                 int maxVolume = Integer.parseInt(maxVolumeInput.getText());
-                String ccHost = ccHostInput.getText();
-                int ccPort = Integer.parseInt(ccPortInput.getText());
 
-                new RetensionBasin(maxVolume, port, ccHost, ccPort);
+                retensionBasin = new RetensionBasin(maxVolume, port);
+                updateParameters();
             }
         });
         add(startButton);
 
+        // Filling Percentage label
+        add(new JLabel("Filling Percentage:"));
+        fillingPercentageLabel = new JLabel("N/A");
+        add(fillingPercentageLabel);
+
+        // Water Discharge label
+        add(new JLabel("Water Discharge:"));
+        waterDischargeLabel = new JLabel("N/A");
+        add(waterDischargeLabel);
+
+        // Refresh button
+        JButton refreshButton = new JButton("Refresh Parameters");
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                updateParameters();
+            }
+        });
+        add(refreshButton);
+
         setVisible(true);
+    }
+
+    private void updateParameters() {
+        if (retensionBasin != null) {
+            fillingPercentageLabel.setText(retensionBasin.getFillingPercentage() + "%");
+            waterDischargeLabel.setText(retensionBasin.getWaterDischarge() + " L/s");
+        }
     }
 
     public static void main(String[] args) {
