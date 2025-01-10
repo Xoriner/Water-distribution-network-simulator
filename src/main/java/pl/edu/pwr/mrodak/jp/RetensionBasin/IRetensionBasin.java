@@ -1,4 +1,4 @@
-package pl.edu.pwr.mrodak.jp;
+package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
 public interface IRetensionBasin {
     int getWaterDischarge();

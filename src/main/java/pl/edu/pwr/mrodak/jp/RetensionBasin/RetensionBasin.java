@@ -1,4 +1,4 @@
-package pl.edu.pwr.mrodak.jp;
+package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
 import java.io.*;
 import java.net.*;
@@ -62,8 +62,9 @@ public class RetensionBasin implements IRetensionBasin {
     }
 
     private String handleRequest(String request) {
-        // Parse and handle the request
-        // Return the appropriate response
-        return "0"; // Placeholder response
+        if ("GET_STATUS".equals(request)) {
+            return "Status: OK, Max Volume: " + maxVolume + ", Current Volume: " + currentVolume;
+        }
+        return "Unknown request";
     }
 }

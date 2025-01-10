@@ -17,7 +17,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>pl.edu.pwr.mrodak.jp.ControlCenter</mainClass>
+                            <mainClass>pl.edu.pwr.mrodak.jp.ControlCenter.ControlCenter</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

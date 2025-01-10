@@ -1,4 +1,4 @@
-package pl.edu.pwr.mrodak.jp;
+package pl.edu.pwr.mrodak.jp.ControlCenter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -32,7 +32,7 @@ public class ControlCenter implements IControlCenter {
                     System.err.println("Failed to get status from basin at " + host + ":" + port);
                 }
             }
-        }, 0, 10, TimeUnit.SECONDS);
+        }, 0, 5, TimeUnit.SECONDS);
     }
 
     private String sendRequest(String host, int port, String request) {
@@ -48,10 +48,4 @@ public class ControlCenter implements IControlCenter {
         }
     }
 
-    public static void main(String[] args) {
-        ControlCenter controlCenter = new ControlCenter();
-        controlCenter.assignRetensionBasin(8081, "localhost");
-        controlCenter.assignRetensionBasin(8082, "localhost");
-        controlCenter.monitorBasins();
-    }
 }
