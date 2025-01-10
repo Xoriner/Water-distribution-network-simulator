@@ -6,14 +6,23 @@ import java.util.*;
 
 public class RetensionBasin implements IRetensionBasin {
     private int maxVolume;
+    private String host;
+    private int port;
+    private String controlCenterHost;
+    private int controlCenterPort;
+    private Map<Integer, String> incomingRiverSections = new HashMap<>();
     private int currentVolume;
     private int waterDischarge;
     private Map<Integer, Integer> waterInflows = new HashMap<>();
 
-    public RetensionBasin(int maxVolume, int port) {
+    public RetensionBasin(int maxVolume, String host, int port, String controlCenterHost, int controlCenterPort, Map<Integer, String> incomingRiverSections) {
         this.maxVolume = maxVolume;
-        // Start server socket to listen for incoming connections
-        new Thread(() -> startServer(port)).start();
+        this.host = host;
+        this.port = port;
+        this.controlCenterHost = controlCenterHost;
+        this.controlCenterPort = controlCenterPort;
+        this.incomingRiverSections = incomingRiverSections;
+        new Thread(() -> startServer(host, port)).start();
     }
 
     @Override
@@ -38,11 +47,12 @@ public class RetensionBasin implements IRetensionBasin {
 
     @Override
     public void assignRiverSection(int port, String host) {
-        // Implementation to assign river section
+        incomingRiverSections.put(port, host);
     }
 
-    private void startServer(int port) {
+    private void startServer(String host, int port) {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
+            serverSocket.bind(new InetSocketAddress(host, port));
             while (true) {
                 try (Socket clientSocket = serverSocket.accept();
                      InputStream InputStream = clientSocket.getInputStream();
