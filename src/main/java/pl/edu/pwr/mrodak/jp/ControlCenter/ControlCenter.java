@@ -64,6 +64,7 @@ public class ControlCenter extends Observable implements IControlCenter, TcpConn
 
     @Override
     public String handleRequest(String request) {
+        //Arb:port,host Assign Retension Basin request
         if (request != null && request.startsWith("arb:")) {
             return processRegisterBasinRequest(request);
         } else {

@@ -77,68 +77,11 @@ public class EnvironmentApp extends JFrame implements Observer {
 
         environment = new Environment("localhost", port);
         environment.addObserver(this);
-        environment.monitorRiverSections();
-
-        executor = Executors.newCachedThreadPool();
-        try {
-            serverSocket = new ServerSocket(port);
-            JOptionPane.showMessageDialog(this, "Environment started on port " + port, "Success", JOptionPane.INFORMATION_MESSAGE);
-
-            executor.submit(() -> {
-                while (!serverSocket.isClosed()) {
-                    try {
-                        Socket clientSocket = serverSocket.accept();
-                        handleClient(clientSocket);
-                    } catch (Exception ex) {
-                        if (!serverSocket.isClosed()) {
-                            ex.printStackTrace();
-                        }
-                    }
-                }
-            });
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Failed to start environment: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        environment.start();
     }
 
-    //TO-DO: Implement this method
-    private void listenForClients() {
-        try {
-            while (!serverSocket.isClosed()) {
-                Socket clientSocket = serverSocket.accept();
-                handleClient(clientSocket);
-            }
-        } catch (Exception ex) {
-            if (!serverSocket.isClosed()) {
-                ex.printStackTrace();
-            }
-        }
-    }
 
-    private void handleClient(Socket clientSocket) {
-        executor.submit(() -> {
-            try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-                 PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
-
-                String request = in.readLine();
-                if (request != null && request.startsWith("ars:")) {
-                    processRegisterRiverSectionRequest(request, out);
-                } else {
-                    System.err.println("Unrecognized request: " + request);
-                    out.println("0"); // Response code 0 for failure
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                try {
-                    clientSocket.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-
+    //Get rid of this probably
     private void processRegisterRiverSectionRequest(String request, PrintWriter out) {
         String[] parts = request.substring(4).split(",");
         if (parts.length == 2) {

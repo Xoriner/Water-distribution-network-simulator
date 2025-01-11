@@ -17,6 +17,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     private int outputBasinPort;
     private ExecutorService executor;
     private TcpConnectionHandler tcpConnectionHandler;
+    private int rainFall;
 
     public RiverSection(int delay, int port, String environmentHost, int environmentPort, String retentionBasinHost, int outputBasinPort) {
         this.delay = delay;
@@ -32,7 +33,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
 
     @Override
     public void start() {
-        //registerWithEnvironment();
+        registerWithEnvironment();
         //registerWithRetentionBasin();
         executor.submit(() -> tcpConnectionHandler.startServer(port, this));
     }
@@ -43,8 +44,10 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
 
     @Override
     public void setRainfall(int rainfall) {
-
+        this.rainFall = rainfall;
     }
+
+
 
     //RetentionBasin at the end of the river section
     @Override
@@ -54,6 +57,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     }
 
     private String sendRequest(String host, int port, String request) {
+        System.out.println("Sending request to " + host + ":" + port + ": " + request);
         return tcpConnectionHandler.sendRequest(host, port, request);
     }
 
@@ -66,8 +70,8 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
             System.err.println("Failed to register River Section with Retention Basin.");
         }
     }
-    public void registerWithEnvironment() {
-        String response = sendRequest(environmentHost, environmentPort, "rws:" + port);
+    public void registerWithEnvironment() { //change the localhost to host
+        String response = sendRequest(environmentHost, environmentPort, "ars:" + port + "," + "localhost");
         if ("1".equals(response)) {
             System.out.println("River Section registered with Environment.");
         } else {
@@ -88,8 +92,16 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
             }
         } else if(request.startsWith("arb:")) { //assignRetensionBasin
             return processRegisterBasinRequest(request);
+        } else if(request.startsWith("grf:")) {
+            //getRainfall
+            System.out.println("Rainfall: " + getRainfall());
+            return String.valueOf(getRainfall());
         }
         return "Unknown request";
+    }
+
+    private int getRainfall() {
+        return rainFall;
     }
 
     private String processRegisterBasinRequest(String request) {

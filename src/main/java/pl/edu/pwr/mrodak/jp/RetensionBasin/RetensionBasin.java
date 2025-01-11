@@ -78,6 +78,7 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         this.host = host;
     }
 
+    //Send assignRetensionBasin request to the River Section (input for the Retension Basin)
     public void registerWithIncomingRiverSections() {
         for (int port : incomingRiverSectionPorts) {
             String response = sendRequest(host, port, "arb:" + this.port + "," + this.host);
