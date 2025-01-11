@@ -2,10 +2,6 @@ package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.*;
-import java.net.*;
-import java.util.HashMap;
-import java.util.Map;
 
 public class RetensionBasinApp extends JFrame {
     private JTextField hostInput;
@@ -103,8 +99,7 @@ public class RetensionBasinApp extends JFrame {
             int controlCenterPort = Integer.parseInt(controlCenterPortInput.getText());
 
             retensionBasin = new RetensionBasin(maxVolume, host, port, controlCenterHost, controlCenterPort);
-            retensionBasin.registerWithControlCenter();
-            updateLabels();
+            retensionBasin.start();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Invalid input. Please check your entries.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -118,6 +113,6 @@ public class RetensionBasinApp extends JFrame {
     }
 
     public static void main(String[] args) {
-        new RetensionBasinApp();
+        SwingUtilities.invokeLater(RetensionBasinApp::new);
     }
 }

@@ -7,7 +7,7 @@ public interface IControlCenter {
     void addObserver(ControlCenterApp controlCenterApp);
     void removeObserver(Observer observer);
 
-    void listenForClients();
+    void startServer();
 
     void start();
 }

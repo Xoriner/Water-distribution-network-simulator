@@ -1,6 +1,8 @@
 package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
 public interface IRetensionBasin {
+    void start();
+
     int getWaterDischarge();
 
     long getFillingPercentage();

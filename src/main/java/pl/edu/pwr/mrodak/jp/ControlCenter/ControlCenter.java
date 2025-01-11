@@ -30,7 +30,7 @@ public class ControlCenter extends Observable implements IControlCenter {
 
     @Override
     public void start() {
-        executor.submit(this::listenForClients);
+        executor.submit(this::startServer);
         monitorBasins();
     }
 
@@ -67,7 +67,7 @@ public class ControlCenter extends Observable implements IControlCenter {
         super.removeObserver(observer);
     }
 
-    public void listenForClients() {
+    public void startServer() {
         try {
             serverSocket = new ServerSocket(port);
             System.out.println("Control Center started on port " + port);
@@ -92,12 +92,8 @@ public class ControlCenter extends Observable implements IControlCenter {
              PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
             String request = in.readLine();
-            if (request != null && request.startsWith("arb:")) {
-                processRegisterBasinRequest(request, out);
-            } else {
-                System.err.println("Unrecognized request: " + request);
-                out.println("0"); // Response code 0 for failure
-            }
+            String response = handleRequest(request);
+            out.println(response);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -109,7 +105,16 @@ public class ControlCenter extends Observable implements IControlCenter {
         }
     }
 
-    private void processRegisterBasinRequest(String request, PrintWriter out) {
+    private String handleRequest(String request) {
+        if (request != null && request.startsWith("arb:")) {
+            return processRegisterBasinRequest(request);
+        } else {
+            System.err.println("Unrecognized request: " + request);
+            return "0"; // Response code 0 for failure
+        }
+    }
+
+    private String processRegisterBasinRequest(String request) {
         String[] parts = request.substring(4).split(",");
         if (parts.length == 2) {
             try {
@@ -121,14 +126,14 @@ public class ControlCenter extends Observable implements IControlCenter {
                     retensionBasins.put(port, host);
                     System.out.println("Registered retension basin: " + basin);
                 }
-                out.println("1"); // Response code 1 for success
+                return "1"; // Response code 1 for success
             } catch (NumberFormatException ex) {
-                out.println("0"); // Response code 0 for failure
                 System.err.println("Invalid port format: " + parts[0]);
+                return "0"; // Response code 0 for failure
             }
         } else {
-            out.println("0"); // Response code 0 for failure
             System.err.println("Invalid registration format: " + request);
+            return "0"; // Response code 0 for failure
         }
     }
 
