@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -19,6 +21,9 @@ public class RetensionBasin implements IRetensionBasin {
     private int waterDischarge;
     private ServerSocket serverSocket;
     private ExecutorService executor;
+
+    private List<Integer> incomingRiverSectionPorts = new ArrayList<>();
+    private int outgoingRiverSectionPort;
 
     public RetensionBasin(int maxVolume, String host, int port, String controlCenterHost, int controlCenterPort) {
         this.maxVolume = maxVolume;
@@ -40,28 +45,48 @@ public class RetensionBasin implements IRetensionBasin {
     }
 
     public long getFillingPercentage() {
-        currentVolume = currentVolume + 10;
         return (int) ((double) currentVolume / maxVolume * 100);
     }
 
     @Override
     public void setWaterDischarge(int waterDischarge) {
         this.waterDischarge = waterDischarge;
+        sendWaterDischargeToOutgoingSection();
     }
 
     @Override
     public void setWaterInflow(int waterInflow, int port) {
-        try (Socket socket = new Socket(host, port);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-            out.println("srd:" + waterInflow);
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (incomingRiverSectionPorts.contains(port)) {
+            currentVolume += waterInflow;
+            if (currentVolume > maxVolume) {
+                currentVolume = maxVolume;
+            }
         }
     }
 
     @Override
     public void assignRiverSection(int port, String host) {
-        // Implementation here
+        this.outgoingRiverSectionPort = port;
+        this.host = host;
+    }
+
+    public void addIncomingRiverSectionPort(int port) {
+        incomingRiverSectionPorts.add(port);
+    }
+
+    public void setOutgoingRiverSectionPort(int port) {
+        this.outgoingRiverSectionPort = port;
+    }
+
+    private void sendWaterDischargeToOutgoingSection() {
+        if (outgoingRiverSectionPort > 0) {
+            try (Socket socket = new Socket(host, outgoingRiverSectionPort);
+                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+                out.println("srd:" + waterDischarge);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private String sendRequest(String host, int port, String request) {
@@ -127,17 +152,42 @@ public class RetensionBasin implements IRetensionBasin {
             return String.valueOf(getFillingPercentage());
         } else if ("gwd".equals(request)) {
             return String.valueOf(getWaterDischarge());
-        } else if (request != null && request.startsWith("swd:")) {
+        } else if (request.startsWith("swd:")) {
             setWaterDischarge(Integer.parseInt(request.substring(4)));
             return "1"; // Success response
-        } else if (request != null && request.startsWith("swi:")) {
+        } else if (request.startsWith("swi:")) {
             String[] parts = request.substring(4).split(",");
             int port = Integer.parseInt(parts[0]);
             int waterInflow = Integer.parseInt(parts[1]);
             setWaterInflow(waterInflow, port);
             return "1"; // Success response
+        } else if (request.startsWith("arb:")) {
+            return processRegisterBasinRequest(request);
         }
         return "Unknown request";
+    }
+
+    private String processRegisterBasinRequest(String request) {
+        String[] parts = request.substring(4).split(",");
+        if (parts.length == 2) {
+            try {
+                int port = Integer.parseInt(parts[0].trim());
+                String host = parts[1].trim();
+                String basin = host + ":" + port;
+
+                if (!incomingRiverSectionPorts.contains(port)) {
+                    incomingRiverSectionPorts.add(port);
+                    System.out.println("Registered incoming river section: " + basin);
+                }
+                return "1"; // Response code 1 for success
+            } catch (NumberFormatException ex) {
+                System.err.println("Invalid port format: " + parts[0]);
+                return "0"; // Response code 0 for failure
+            }
+        } else {
+            System.err.println("Invalid registration format: " + request);
+            return "0"; // Response code 0 for failure
+        }
     }
 
     public void shutdown() {

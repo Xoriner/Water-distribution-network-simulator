@@ -7,8 +7,6 @@ public interface IControlCenter {
     void addObserver(ControlCenterApp controlCenterApp);
     void removeObserver(Observer observer);
 
-    void startServer();
-
     void start();
 
     void setWaterDischarge(int port, int waterDischarge);
