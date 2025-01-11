@@ -21,6 +21,7 @@ public class ControlCenter implements IControlCenter {
         this.host = host;
         this.port = port;
     }
+
     @Override
     public void assignRetensionBasin(int port, String host) {
         retensionBasins.put(port, host);
@@ -29,16 +30,17 @@ public class ControlCenter implements IControlCenter {
     public void monitorBasins() {
         scheduler.scheduleAtFixedRate(() -> {
             for (Map.Entry<Integer, String> entry : retensionBasins.entrySet()) {
-                int port = entry.getKey();
-                String host = entry.getValue();
-                String status = sendRequest(host, port, "gfp");
+                int basinPort = entry.getKey();
+                String basinHost = entry.getValue();
+                String status = sendRequest(basinHost, basinPort, "gfp");
+
                 if (status != null) {
-                    System.out.println("Status of basin at " + host + ":" + port + " - " + status);
+                    System.out.println("Status of basin at " + basinHost + ":" + basinPort + " - " + status + "% filled.");
                 } else {
-                    System.err.println("Failed to get status from basin at " + host + ":" + port);
+                    System.err.println("Failed to get status from basin at " + basinHost + ":" + basinPort);
                 }
             }
-        }, 0, 5, TimeUnit.SECONDS);
+        }, 0, 5, TimeUnit.SECONDS); // Check every 5 seconds
     }
 
     private String sendRequest(String host, int port, String request) {
@@ -49,9 +51,7 @@ public class ControlCenter implements IControlCenter {
             return in.readLine();
         } catch (IOException e) {
             System.err.println("Failed to connect to " + host + ":" + port + " - " + e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }
-
 }

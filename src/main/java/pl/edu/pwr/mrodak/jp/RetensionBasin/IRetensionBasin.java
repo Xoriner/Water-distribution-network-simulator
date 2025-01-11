@@ -10,4 +10,5 @@ public interface IRetensionBasin {
     void setWaterInflow(int waterInflow, int port);
 
     void assignRiverSection(int port, String host);
+
 }

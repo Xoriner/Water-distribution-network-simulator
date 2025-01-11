@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="5fe9c208-d5ed-4bb2-ab01-7985ce454a9e" name="Changes" comment="First Commit, Tryint out Basin and Control">
+      <change afterPath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/ControlCenter/ControlCenterApp.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/RetensionBasin/RetensionBasinApp.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/module-info.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/module-info.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/ControlCenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/ControlCenter/ControlCenter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/Environment.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/Environment/Environment.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/IControlCenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/ControlCenter/IControlCenter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/IRetensionBasin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/RetensionBasin/IRetensionBasin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/Main.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/RetensionBasin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pl/edu/pwr/mrodak/jp/RetensionBasin/RetensionBasin.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="module-info" />
+        <option value="Interface" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Xoriner&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/Xoriner/Water-distribution-network-simulator.git&quot;,
+    &quot;accountId&quot;: &quot;b0e4d258-e264-40fb-8487-6adcd30dd315&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="2qIJlvPfcZvxRaEuKjK5G9uvxUn" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.ControlCenter.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ControlCenterApp.executor&quot;: &quot;Run&quot;,
+    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
+    &quot;Application.RetensionBasin.executor&quot;: &quot;Run&quot;,
+    &quot;Application.RetensionBasinAppGUI.executor&quot;: &quot;Run&quot;,
+    &quot;JAR Application.lab06_pop-1.0-SNAPSHOT.jar.executor&quot;: &quot;Run&quot;,
+    &quot;Maven.lab06_pop [clean].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.lab06_pop [install].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.lab06_pop [package].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.lab06_pop [test].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.lab06_pop [validate].executor&quot;: &quot;Run&quot;,
+    &quot;Maven.lab06_pop [verify].executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/terra/OneDrive - Politechnika Wroclawska/studia/3 semestr/JP/_pop/lab06_pop&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;onboarding.tips.debug.path&quot;: &quot;C:/Users/terra/OneDrive - Politechnika Wroclawska/studia/3 semestr/JP/lab0x/lab06/src/main/java/org/example/Main.java&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RunManager" selected="Application.ControlCenterApp">
+    <configuration name="ControlCenter" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="pl.edu.pwr.mrodak.jp.ControlCenter.ControlCenter" />
+      <module name="lab06_pop" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.edu.pwr.mrodak.jp.RetensionBasin.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ControlCenterApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="pl.edu.pwr.mrodak.jp.ControlCenter.ControlCenterApp" />
+      <module name="lab06_pop" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.edu.pwr.mrodak.jp.ControlCenter.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="pl.edu.pwr.mrodak.jp.Main" />
+      <module name="lab06_pop" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.edu.pwr.mrodak.jp.RetensionBasin.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RetensionBasinApp" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="pl.edu.pwr.mrodak.jp.RetensionBasin.RetensionBasinApp" />
+      <module name="lab06_pop" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="pl.edu.pwr.mrodak.jp.RetensionBasin.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="lab06_pop-1.0-SNAPSHOT.jar" type="JarApplication" temporary="true">
+      <option name="JAR_PATH" value="$PROJECT_DIR$/target/lab06_pop-1.0-SNAPSHOT.jar" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.ControlCenterApp" />
+        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.ControlCenter" />
+        <item itemvalue="JAR Application.lab06_pop-1.0-SNAPSHOT.jar" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5fe9c208-d5ed-4bb2-ab01-7985ce454a9e" name="Changes" comment="" />
+      <created>1734344312593</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1734344312593</updated>
+      <workItem from="1734344314132" duration="2413000" />
+      <workItem from="1736432636106" duration="49000" />
+      <workItem from="1736432704802" duration="819000" />
+      <workItem from="1736441685151" duration="11616000" />
+      <workItem from="1736516018466" duration="345000" />
+      <workItem from="1736518469037" duration="2407000" />
+    </task>
+    <task id="LOCAL-00001" summary="First Commit, Tryint out Basin and Control">
+      <option name="closed" value="true" />
+      <created>1736477797052</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1736477797052</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="First Commit, Tryint out Basin and Control" />
+    <option name="LAST_COMMIT_MESSAGE" value="First Commit, Tryint out Basin and Control" />
+  </component>
+</project>
