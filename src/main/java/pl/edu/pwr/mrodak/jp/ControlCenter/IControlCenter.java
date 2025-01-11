@@ -8,4 +8,6 @@ public interface IControlCenter {
     void removeObserver(Observer observer);
 
     void listenForClients();
+
+    void start();
 }

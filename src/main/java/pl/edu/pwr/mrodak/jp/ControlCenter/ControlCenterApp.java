@@ -66,8 +66,7 @@ public class ControlCenterApp extends JFrame implements Observer {
 
         controlCenter = new ControlCenter("localhost", port);
         controlCenter.addObserver(this);
-        controlCenter.monitorBasins();
-        controlCenter.listenForClients();
+        controlCenter.start();
     }
 
     @Override
