@@ -13,18 +13,18 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     private int port;
     private String environmentHost;
     private int environmentPort;
-    private String retentionBasinHost;
-    private int retentionBasinPort;
+    private String outputBasinHost;
+    private int outputBasinPort;
     private ExecutorService executor;
     private TcpConnectionHandler tcpConnectionHandler;
 
-    public RiverSection(int delay, int port, String environmentHost, int environmentPort, String retentionBasinHost, int retentionBasinPort) {
+    public RiverSection(int delay, int port, String environmentHost, int environmentPort, String retentionBasinHost, int outputBasinPort) {
         this.delay = delay;
         this.port = port;
         this.environmentHost = environmentHost;
         this.environmentPort = environmentPort;
-        this.retentionBasinHost = retentionBasinHost;
-        this.retentionBasinPort = retentionBasinPort;
+        this.outputBasinHost = retentionBasinHost;
+        this.outputBasinPort = outputBasinPort;
         this.executor = Executors.newCachedThreadPool();
         this.tcpConnectionHandler = new TcpConnectionHandler();
     }
@@ -32,8 +32,8 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
 
     @Override
     public void start() {
-        registerWithEnvironment();
-        registerWithRetentionBasin();
+        //registerWithEnvironment();
+        //registerWithRetentionBasin();
         executor.submit(() -> tcpConnectionHandler.startServer(port, this));
     }
     @Override
@@ -49,8 +49,8 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     //RetentionBasin at the end of the river section
     @Override
     public void assignRetensionBasin(int port, String host) {
-        this.retentionBasinPort = port;
-        this.retentionBasinHost = host;
+        this.outputBasinPort = port;
+        this.outputBasinHost = host;
     }
 
     private String sendRequest(String host, int port, String request) {
@@ -59,7 +59,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
 
     //River Section
     public void registerWithRetentionBasin() {
-        String response = sendRequest(retentionBasinHost, retentionBasinPort, "ars:" + port);
+        String response = sendRequest(outputBasinHost, outputBasinPort, "ars:" + port);
         if ("1".equals(response)) {
             System.out.println("River Section registered with Retention Basin.");
         } else {
@@ -77,7 +77,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     @Override
     public String handleRequest(String request) {
         if ("gwf".equals(request)) {
-            return String.valueOf(0);
+            return String.valueOf(1);//TODO: Implement this method
         } else if (request.startsWith("swf:")) {
             try {
                 int flow = Integer.parseInt(request.substring(4));
