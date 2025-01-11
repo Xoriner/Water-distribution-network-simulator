@@ -1,16 +1,18 @@
 package pl.edu.pwr.mrodak.jp.RiverSection;
 
+import pl.edu.pwr.mrodak.jp.Observer;
+
 import javax.swing.*;
 import java.awt.*;
 
-public class RiverSectionApp  extends JFrame {
+public class RiverSectionApp  extends JFrame implements Observer {
     private JTextField delayInput;
     private JTextField portInput;
     private JTextField envHostInput;
     private JTextField envPortInput;
     private JTextField basinHostInput;
     private JTextField basinPortInput;
-    private RiverSection riverSection;
+    private IRiverSection riverSection;
 
     public RiverSectionApp() {
         setTitle("River Section Configuration");
@@ -66,9 +68,17 @@ public class RiverSectionApp  extends JFrame {
         basinHostInput = new JTextField("localhost");
         add(basinHostInput, gbc);
 
-        // Start Button
+        //Basin Port Input
         gbc.gridx = 0;
         gbc.gridy = 5;
+        add(new JLabel("Basin Port:"), gbc);
+        gbc.gridx = 1;
+        basinPortInput = new JTextField("8082");
+        add(basinPortInput, gbc);
+
+        // Start Button
+        gbc.gridx = 0;
+        gbc.gridy = 6;
         gbc.gridwidth = 2;
         JButton startButton = new JButton("Start River Section");
         startButton.addActionListener(e -> startRiverSection());
@@ -84,8 +94,9 @@ public class RiverSectionApp  extends JFrame {
             String basinHost = basinHostInput.getText();
             int basinPort = Integer.parseInt(basinPortInput.getText());
 
-            riverSection = new RiverSection("localhost", port, delay);
-            riverSection.assignRetensionBasin(basinPort, basinHost);
+            riverSection = new RiverSection(delay, port, envHost, envPort, basinHost, basinPort);
+            riverSection.addObserver(this);
+            riverSection.start();
         } catch(NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -93,5 +104,11 @@ public class RiverSectionApp  extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(RiverSectionApp::new);
+    }
+
+    @Override
+    //TODO: Implement this method
+    public void update(String host, int port, String fillStatus, int waterDischarge) {
+
     }
 }

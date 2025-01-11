@@ -1,49 +1,75 @@
 package pl.edu.pwr.mrodak.jp.RiverSection;
 
+import pl.edu.pwr.mrodak.jp.Observable;
+import pl.edu.pwr.mrodak.jp.Observer;
 import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RiverSection implements IRiverSection, TcpConnectionHandler.RequestHandler {
-    private String host;
+public class RiverSection extends Observable implements IRiverSection, TcpConnectionHandler.RequestHandler {
+
+    private int delay;
     private int port;
-    private int waterFlow;
-    private int maxCapacity;
+    private String environmentHost;
+    private int environmentPort;
+    private String retentionBasinHost;
+    private int retentionBasinPort;
     private ExecutorService executor;
     private TcpConnectionHandler tcpConnectionHandler;
 
-    public RiverSection(String host, int port, int maxCapacity) {
-        this.host = host;
+    public RiverSection(int delay, int port, String environmentHost, int environmentPort, String retentionBasinHost, int retentionBasinPort) {
+        this.delay = delay;
         this.port = port;
-        this.maxCapacity = maxCapacity;
-        this.waterFlow = 0; // Initial water flow
+        this.environmentHost = environmentHost;
+        this.environmentPort = environmentPort;
+        this.retentionBasinHost = retentionBasinHost;
+        this.retentionBasinPort = retentionBasinPort;
         this.executor = Executors.newCachedThreadPool();
         this.tcpConnectionHandler = new TcpConnectionHandler();
     }
 
 
+    @Override
     public void start() {
+        //registerWithEnvironment();
+        //registerWithRetentionBasin();
         executor.submit(() -> tcpConnectionHandler.startServer(port, this));
     }
+    @Override
+    public void setRealDischarge(int realDischarge) {
 
-    public void setWaterFlow(int waterFlow) {
-        if (waterFlow > maxCapacity) {
-            this.waterFlow = maxCapacity; // Cap the flow to the maximum capacity
-        } else {
-            this.waterFlow = waterFlow;
-        }
-        System.out.println("Water flow set to: " + this.waterFlow);
     }
 
     @Override
+    public void setRainfall(int rainfall) {
+
+    }
+
+    @Override
+    public void assignRetensionBasin(int port, String host) {
+
+    }
+
+    private String sendRequest(String host, int port, String request) {
+        return tcpConnectionHandler.sendRequest(host, port, request);
+    }
+
+    public void registerWithEnvironment() {
+        String response = sendRequest(environmentHost, environmentPort, "rws:" + port);
+        if ("1".equals(response)) {
+            System.out.println("River Section registered with Environment.");
+        } else {
+            System.err.println("Failed to register River Section with Environment.");
+        }
+    }
+    @Override
     public String handleRequest(String request) {
         if ("gwf".equals(request)) {
-            return String.valueOf(waterFlow);
+            return String.valueOf(0);
         } else if (request.startsWith("swf:")) {
             try {
                 int flow = Integer.parseInt(request.substring(4));
-                setWaterFlow(flow);
                 return "1"; // Success response
             } catch (NumberFormatException e) {
                 System.err.println("Invalid water flow value: " + request);
@@ -60,17 +86,12 @@ public class RiverSection implements IRiverSection, TcpConnectionHandler.Request
     }
 
     @Override
-    public void setRealDischarge(int realDischarge) {
-
+    public void addObserver(RiverSectionApp riverSectionApp) {
+        super.addObserver(riverSectionApp);
     }
 
     @Override
-    public void setRainfall(int rainfall) {
-
-    }
-
-    @Override
-    public void assignRetensionBasin(int port, String host) {
-
+    public void removeObserver(Observer observer) {
+        super.removeObserver(observer);
     }
 }

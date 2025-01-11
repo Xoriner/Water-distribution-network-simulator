@@ -78,11 +78,9 @@ public class ControlCenter extends Observable implements IControlCenter, TcpConn
             try {
                 int port = Integer.parseInt(parts[0].trim());
                 String host = parts[1].trim();
-                String basin = host + ":" + port;
 
                 if (!retensionBasins.containsKey(port)) {
-                    retensionBasins.put(port, host);
-                    System.out.println("Registered retension basin: " + basin);
+                    assignRetensionBasin(port, host);
                 }
                 return "1"; // Response code 1 for success
             } catch (NumberFormatException ex) {
