@@ -22,6 +22,11 @@ public class ControlCenterApp extends JFrame {
         setSize(400, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
+        initializeUI();
+        setVisible(true);
+    }
+
+    private void initializeUI() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(7, 7, 7, 7);
@@ -45,7 +50,6 @@ public class ControlCenterApp extends JFrame {
         // List of assigned basins
         gbc.gridx = 0;
         gbc.gridy = 2;
-        gbc.gridwidth = 2;
         add(new JLabel("Registered Retension Basins:"), gbc);
 
         JList<String> basinList = new JList<>();
@@ -58,8 +62,6 @@ public class ControlCenterApp extends JFrame {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         add(listScrollPane, gbc);
-
-        setVisible(true);
     }
 
     private void startControlCenter() {
@@ -71,8 +73,30 @@ public class ControlCenterApp extends JFrame {
             return;
         }
 
-        //TO-DO: Implement ControlCenter host
         controlCenter = new ControlCenter("localhost", port);
+
+        // Rejestracja listenera do aktualizacji GUI
+        controlCenter.registerBasinUpdateListener((host, basinPort, fillStatus) -> {
+            SwingUtilities.invokeLater(() -> {
+                String displayText = host + ":" + basinPort + " - Fill: " + fillStatus + "%";
+                boolean updated = false;
+
+                // Aktualizuj istniejący wpis
+                for (int i = 0; i < listModel.size(); i++) {
+                    if (listModel.get(i).startsWith(host + ":" + basinPort)) {
+                        listModel.set(i, displayText);
+                        updated = true;
+                        break;
+                    }
+                }
+
+                // Dodaj nowy wpis, jeśli nie istnieje
+                if (!updated) {
+                    listModel.addElement(displayText);
+                }
+            });
+        });
+
         controlCenter.monitorBasins();
 
         executor = Executors.newCachedThreadPool();
@@ -80,7 +104,6 @@ public class ControlCenterApp extends JFrame {
             serverSocket = new ServerSocket(port);
             JOptionPane.showMessageDialog(this, "Control Center started on port " + port, "Success", JOptionPane.INFORMATION_MESSAGE);
 
-            // Start listening for connections
             executor.submit(() -> {
                 while (!serverSocket.isClosed()) {
                     try {
@@ -98,47 +121,78 @@ public class ControlCenterApp extends JFrame {
         }
     }
 
+    private void listenForClients() {
+        try {
+            while (!serverSocket.isClosed()) {
+                Socket clientSocket = serverSocket.accept();
+                handleClient(clientSocket);
+            }
+        } catch (Exception ex) {
+            if (!serverSocket.isClosed()) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
     private void handleClient(Socket clientSocket) {
         executor.submit(() -> {
             try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
                  PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
 
                 String request = in.readLine();
-                if (request.startsWith("arb:")) { // Register Retension Basin
-                    String[] parts = request.substring(4).split(",");
-                    if (parts.length == 2) {
-                        int port;
-                        try {
-                            port = Integer.parseInt(parts[0].trim());
-                        } catch (NumberFormatException ex) {
-                            out.println("0"); // Response code 0 for failure
-                            System.err.println("Invalid port format: " + parts[0]);
-                            return;
-                        }
-
-                        String host = parts[1].trim();
-                        String basin = host + ":" + port;
-
-                        if (!listModel.contains(basin)) {
-                            listModel.addElement(basin); // Add basin to GUI list
-                            controlCenter.assignRetensionBasin(port, host); // Add basin to Control Center
-                        }
-
-                        // Respond to confirm registration
-                        out.println("1"); // Response code 1 for success
-                    } else {
-                        out.println("0"); // Response code 0 for failure
-                        System.err.println("Invalid registration format: " + request);
-                    }
+                if (request != null && request.startsWith("arb:")) {
+                    processRegisterBasinRequest(request, out);
                 } else {
                     System.err.println("Unrecognized request: " + request);
+                    out.println("0"); // Response code 0 for failure
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();
+            } finally {
+                try {
+                    clientSocket.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
+    private void processRegisterBasinRequest(String request, PrintWriter out) {
+        String[] parts = request.substring(4).split(",");
+        if (parts.length == 2) {
+            try {
+                int port = Integer.parseInt(parts[0].trim());
+                String host = parts[1].trim();
+                String basin = host + ":" + port;
+
+                if (!listModel.contains(basin)) {
+                    listModel.addElement(basin); // Add basin to GUI list
+                    controlCenter.assignRetensionBasin(port, host); // Add basin to Control Center
+                }
+                out.println("1"); // Response code 1 for success
+            } catch (NumberFormatException ex) {
+                out.println("0"); // Response code 0 for failure
+                System.err.println("Invalid port format: " + parts[0]);
+            }
+        } else {
+            out.println("0"); // Response code 0 for failure
+            System.err.println("Invalid registration format: " + request);
+        }
+    }
+
+    private void shutdownServer() {
+        try {
+            if (serverSocket != null && !serverSocket.isClosed()) {
+                serverSocket.close();
+            }
+            if (executor != null) {
+                executor.shutdownNow();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(ControlCenterApp::new);
