@@ -32,8 +32,8 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
 
     @Override
     public void start() {
-        //registerWithEnvironment();
-        //registerWithRetentionBasin();
+        registerWithEnvironment();
+        registerWithRetentionBasin();
         executor.submit(() -> tcpConnectionHandler.startServer(port, this));
     }
     @Override
@@ -86,7 +86,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
                 System.err.println("Invalid water flow value: " + request);
                 return "0"; // Failure response
             }
-        } else if(request.startsWith("arb:")) {
+        } else if(request.startsWith("arb:")) { //assignRetensionBasin
             return processRegisterBasinRequest(request);
         }
         return "Unknown request";

@@ -4,9 +4,7 @@ import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.RequestHandler {
     private int maxVolume;
@@ -21,6 +19,7 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
 
     private List<Integer> incomingRiverSectionPorts = new CopyOnWriteArrayList<>();
     private int outgoingRiverSectionPort;
+    private ConcurrentMap<Integer, Integer> inflows = new ConcurrentHashMap<>();
 
     public RetensionBasin(int maxVolume, String host, int port, String controlCenterHost, int controlCenterPort) {
         this.maxVolume = maxVolume;
@@ -56,19 +55,25 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
     @Override
     public void setWaterInflow(int waterInflow, int port) {
         if (incomingRiverSectionPorts.contains(port)) {
-            currentVolume += waterInflow;
-            if (currentVolume > maxVolume) {
-                currentVolume = maxVolume;
-            }
+            inflows.put(port, waterInflow);
+            updateCurrentVolume();
         }
     }
 
-    //Assign outgoing river section
+    private void updateCurrentVolume() {
+        currentVolume = inflows.values().stream().mapToInt(Integer::intValue).sum();
+        if (currentVolume > maxVolume) {
+            currentVolume = maxVolume;
+        }
+        System.out.println("Current volume: " + currentVolume);
+    }
+
     @Override
     public void assignRiverSection(int port, String host) {
         this.outgoingRiverSectionPort = port;
         this.host = host;
     }
+
     public void registerWithIncomingRiverSections() {
         for (int port : incomingRiverSectionPorts) {
             String response = sendRequest(host, port, "arb:" + this.port + "," + this.host);
@@ -82,12 +87,12 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
 
     @Override
     public void addIncomingRiverSection(String host, int port) {
-        if(incomingRiverSectionPorts.contains(port)) {
-            System.out.println(STR."Incoming river section already added: \{host}:\{port}");
+        if (incomingRiverSectionPorts.contains(port)) {
+            System.out.println("Incoming river section already added: " + host + ":" + port);
             return;
         }
         incomingRiverSectionPorts.add(port);
-        System.out.println(STR."Added incoming river section: \{host}:\{port}");
+        System.out.println("Added incoming river section: " + host + ":" + port);
     }
 
     public void setOutgoingRiverSectionPort(int port) {
@@ -132,7 +137,6 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         return "Unknown request";
     }
 
-    // Register incoming river section
     private String processRegisterIncomingRiverSectionRequest(String request) {
         String[] parts = request.substring(4).split(",");
         if (parts.length == 2) {
