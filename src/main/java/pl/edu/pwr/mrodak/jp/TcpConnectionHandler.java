@@ -9,6 +9,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+//TCP connection handler for server and client
 public class TcpConnectionHandler {
     private ServerSocket serverSocket;
     private ExecutorService executor;
