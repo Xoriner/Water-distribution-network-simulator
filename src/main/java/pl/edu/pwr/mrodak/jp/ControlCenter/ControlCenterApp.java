@@ -10,7 +10,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class ControlCenterApp extends JFrame {
+public class ControlCenterApp extends JFrame implements Observer {
     private JTextField controlCenterPortField;
     private DefaultListModel<String> listModel;
     private IControlCenter controlCenter;
@@ -74,29 +74,7 @@ public class ControlCenterApp extends JFrame {
         }
 
         controlCenter = new ControlCenter("localhost", port);
-
-        // Rejestracja listenera do aktualizacji GUI
-        controlCenter.registerBasinUpdateListener((host, basinPort, fillStatus) -> {
-            SwingUtilities.invokeLater(() -> {
-                String displayText = host + ":" + basinPort + " - Fill: " + fillStatus + "%";
-                boolean updated = false;
-
-                // Aktualizuj istniejący wpis
-                for (int i = 0; i < listModel.size(); i++) {
-                    if (listModel.get(i).startsWith(host + ":" + basinPort)) {
-                        listModel.set(i, displayText);
-                        updated = true;
-                        break;
-                    }
-                }
-
-                // Dodaj nowy wpis, jeśli nie istnieje
-                if (!updated) {
-                    listModel.addElement(displayText);
-                }
-            });
-        });
-
+        controlCenter.addObserver(this);
         controlCenter.monitorBasins();
 
         executor = Executors.newCachedThreadPool();
@@ -166,6 +144,7 @@ public class ControlCenterApp extends JFrame {
                 String host = parts[1].trim();
                 String basin = host + ":" + port;
 
+                //TO-DO: FIX THE ERROR WITH CONTAINS
                 if (!listModel.contains(basin)) {
                     listModel.addElement(basin); // Add basin to GUI list
                     controlCenter.assignRetensionBasin(port, host); // Add basin to Control Center
@@ -196,5 +175,23 @@ public class ControlCenterApp extends JFrame {
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(ControlCenterApp::new);
+    }
+
+    @Override
+    public void update(String host, int port, String fillStatus, int waterDischarge) {
+        SwingUtilities.invokeLater(() -> {
+            String displayText = host + ":" + port + " - Fill: " + fillStatus + "%, Discharge: " + waterDischarge + "L";
+            boolean updated = false;
+            for (int i = 0; i < listModel.size(); i++) {
+                if (listModel.get(i).startsWith(host + ":" + port)) {
+                    listModel.set(i, displayText);
+                    updated = true;
+                    break;
+                }
+            }
+            if (!updated) {
+                listModel.addElement(displayText);
+            }
+        });
     }
 }

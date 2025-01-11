@@ -3,5 +3,7 @@ package pl.edu.pwr.mrodak.jp.ControlCenter;
 public interface IControlCenter {
     void assignRetensionBasin(int port, String host);
     void monitorBasins();
-    void registerBasinUpdateListener(BasinUpdateListener listener);
+
+    void addObserver(ControlCenterApp controlCenterApp);
+    void removeObserver(Observer observer);
 }

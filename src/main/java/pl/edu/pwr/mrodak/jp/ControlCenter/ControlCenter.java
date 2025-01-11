@@ -11,12 +11,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ControlCenter implements IControlCenter {
+public class ControlCenter extends Observable implements IControlCenter {
     private String host;
     private int port;
     private Map<Integer, String> retensionBasins = new HashMap<>();
     private ScheduledExecutorService scheduler;
-    private BasinUpdateListener updateListener;
 
     public ControlCenter(String host, int port) {
         this.host = host;
@@ -37,17 +36,24 @@ public class ControlCenter implements IControlCenter {
                 int basinPort = entry.getKey();
                 String basinHost = entry.getValue();
 
-                String fillStatus = sendRequest(basinHost, basinPort, "gwd");
-                if (fillStatus != null && updateListener != null) {
-                    updateListener.onBasinUpdate(basinHost, basinPort, fillStatus);
+                String fillStatus = sendRequest(basinHost, basinPort, "gfp");
+                int waterDischarge = Integer.parseInt(sendRequest(basinHost, basinPort, "gwd"));
+
+                if (fillStatus != null) {
+                    notifyObservers(basinHost, basinPort, fillStatus, waterDischarge);
                 }
             }
         }, 0, 2, TimeUnit.SECONDS);
     }
 
     @Override
-    public void registerBasinUpdateListener(BasinUpdateListener listener) {
-        this.updateListener = listener;
+    public void addObserver(ControlCenterApp controlCenterApp) {
+        super.addObserver(controlCenterApp);
+    }
+
+    @Override
+    public void removeObserver(Observer observer) {
+        super.removeObserver(observer);
     }
 
     private String sendRequest(String host, int port, String request) {

@@ -26,6 +26,7 @@ public class RetensionBasin {
     }
 
     public int getFillingPercentage() {
+        currentVolume = currentVolume + 10;
         return (int) ((double) currentVolume / maxVolume * 100);
     }
 
