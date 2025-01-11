@@ -1,17 +1,13 @@
 package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
+import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class RetensionBasin implements IRetensionBasin {
+public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.RequestHandler {
     private int maxVolume;
     private String host;
     private int port;
@@ -19,8 +15,8 @@ public class RetensionBasin implements IRetensionBasin {
     private int controlCenterPort;
     private int currentVolume;
     private int waterDischarge;
-    private ServerSocket serverSocket;
     private ExecutorService executor;
+    private TcpConnectionHandler tcpConnectionHandler;
 
     private List<Integer> incomingRiverSectionPorts = new ArrayList<>();
     private int outgoingRiverSectionPort;
@@ -32,12 +28,13 @@ public class RetensionBasin implements IRetensionBasin {
         this.controlCenterHost = controlCenterHost;
         this.controlCenterPort = controlCenterPort;
         this.executor = Executors.newCachedThreadPool();
+        this.tcpConnectionHandler = new TcpConnectionHandler();
     }
 
     @Override
     public void start() {
         registerWithControlCenter();
-        executor.submit(this::startServer);
+        executor.submit(() -> tcpConnectionHandler.startServer(port, this));
     }
 
     public int getWaterDischarge() {
@@ -80,26 +77,12 @@ public class RetensionBasin implements IRetensionBasin {
 
     private void sendWaterDischargeToOutgoingSection() {
         if (outgoingRiverSectionPort > 0) {
-            try (Socket socket = new Socket(host, outgoingRiverSectionPort);
-                 PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
-                out.println("srd:" + waterDischarge);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            tcpConnectionHandler.sendRequest(host, outgoingRiverSectionPort, "srd:" + waterDischarge);
         }
     }
 
     private String sendRequest(String host, int port, String request) {
-        try (Socket socket = new Socket(host, port);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-
-            out.println(request);
-            return in.readLine();
-        } catch (IOException e) {
-            System.err.println("Error connecting to " + host + ":" + port + " - " + e.getMessage());
-            return null;
-        }
+        return tcpConnectionHandler.sendRequest(host, port, request);
     }
 
     public void registerWithControlCenter() {
@@ -109,45 +92,8 @@ public class RetensionBasin implements IRetensionBasin {
         }
     }
 
-    private void startServer() {
-        try {
-            serverSocket = new ServerSocket(port);
-            System.out.println("Retension Basin started on port " + port);
-
-            while (!serverSocket.isClosed()) {
-                try {
-                    Socket clientSocket = serverSocket.accept();
-                    executor.submit(() -> handleClient(clientSocket));
-                } catch (Exception ex) {
-                    if (!serverSocket.isClosed()) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            System.err.println("Failed to start server: " + ex.getMessage());
-        }
-    }
-
-    private void handleClient(Socket clientSocket) {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
-
-            String request = in.readLine();
-            String response = handleRequest(request);
-            out.println(response);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                clientSocket.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private String handleRequest(String request) {
+    @Override
+    public String handleRequest(String request) {
         if ("gfp".equals(request)) {
             return String.valueOf(getFillingPercentage());
         } else if ("gwd".equals(request)) {
@@ -191,16 +137,8 @@ public class RetensionBasin implements IRetensionBasin {
     }
 
     public void shutdown() {
-        try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-            }
-            if (executor != null) {
-                executor.shutdownNow();
-            }
-            System.out.println("Retension Basin has been shut down.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
+        tcpConnectionHandler.shutdown();
+        executor.shutdownNow();
+        System.out.println("Retension Basin has been shut down.");
     }
 }

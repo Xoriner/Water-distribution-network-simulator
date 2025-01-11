@@ -1,36 +1,33 @@
 package pl.edu.pwr.mrodak.jp.ControlCenter;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.ServerSocket;
-import java.net.Socket;
+import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
+
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class ControlCenter extends Observable implements IControlCenter {
+public class ControlCenter extends Observable implements IControlCenter, TcpConnectionHandler.RequestHandler {
     private String host;
     private int port;
     private Map<Integer, String> retensionBasins = new HashMap<>();
     private ScheduledExecutorService scheduler;
-    private ServerSocket serverSocket;
     private ExecutorService executor;
+    private TcpConnectionHandler tcpConnectionHandler;
 
     public ControlCenter(String host, int port) {
         this.host = host;
         this.port = port;
         this.scheduler = Executors.newScheduledThreadPool(1);
         this.executor = Executors.newCachedThreadPool();
+        this.tcpConnectionHandler = new TcpConnectionHandler();
     }
 
     @Override
     public void start() {
-        executor.submit(this::startServer);
+        executor.submit(() -> tcpConnectionHandler.startServer(port, this));
         monitorBasins();
     }
 
@@ -47,8 +44,8 @@ public class ControlCenter extends Observable implements IControlCenter {
                 int basinPort = entry.getKey();
                 String basinHost = entry.getValue();
 
-                String fillStatus = sendRequest(basinHost, basinPort, "gfp");
-                int waterDischarge = Integer.parseInt(sendRequest(basinHost, basinPort, "gwd"));
+                String fillStatus = tcpConnectionHandler.sendRequest(basinHost, basinPort, "gfp");
+                int waterDischarge = Integer.parseInt(tcpConnectionHandler.sendRequest(basinHost, basinPort, "gwd"));
 
                 if (fillStatus != null) {
                     notifyObservers(basinHost, basinPort, fillStatus, waterDischarge);
@@ -67,45 +64,8 @@ public class ControlCenter extends Observable implements IControlCenter {
         super.removeObserver(observer);
     }
 
-    public void startServer() {
-        try {
-            serverSocket = new ServerSocket(port);
-            System.out.println("Control Center started on port " + port);
-
-            while (!serverSocket.isClosed()) {
-                try {
-                    Socket clientSocket = serverSocket.accept();
-                    executor.submit(() -> handleClient(clientSocket));
-                } catch (Exception ex) {
-                    if (!serverSocket.isClosed()) {
-                        ex.printStackTrace();
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            System.err.println("Failed to start server: " + ex.getMessage());
-        }
-    }
-
-    private void handleClient(Socket clientSocket) {
-        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
-
-            String request = in.readLine();
-            String response = handleRequest(request);
-            out.println(response);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                clientSocket.close();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    private String handleRequest(String request) {
+    @Override
+    public String handleRequest(String request) {
         if (request != null && request.startsWith("arb:")) {
             return processRegisterBasinRequest(request);
         } else {
@@ -140,37 +100,16 @@ public class ControlCenter extends Observable implements IControlCenter {
     public void setWaterDischarge(int port, int waterDischarge) {
         String host = retensionBasins.get(port);
         if (host != null) {
-            sendRequest(host, port, "swd:" + waterDischarge);
+            tcpConnectionHandler.sendRequest(host, port, "swd:" + waterDischarge);
         } else {
             System.err.println("No retension basin found on port: " + port);
         }
     }
 
     public void shutdown() {
-        try {
-            if (serverSocket != null && !serverSocket.isClosed()) {
-                serverSocket.close();
-            }
-            if (executor != null) {
-                executor.shutdownNow();
-            }
-            scheduler.shutdownNow();
-            System.out.println("ControlCenter has been shut down.");
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-    }
-
-    private String sendRequest(String host, int port, String request) {
-        try (Socket socket = new Socket(host, port);
-             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
-
-            out.println(request);
-            return in.readLine();
-        } catch (IOException e) {
-            System.err.println("Error connecting to " + host + ":" + port + " - " + e.getMessage());
-            return null;
-        }
+        tcpConnectionHandler.shutdown();
+        scheduler.shutdownNow();
+        executor.shutdownNow();
+        System.out.println("ControlCenter has been shut down.");
     }
 }
