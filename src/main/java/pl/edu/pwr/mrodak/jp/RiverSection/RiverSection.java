@@ -46,15 +46,26 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
 
     }
 
+    //RetentionBasin at the end of the river section
     @Override
     public void assignRetensionBasin(int port, String host) {
-
+        this.retentionBasinPort = port;
+        this.retentionBasinHost = host;
     }
 
     private String sendRequest(String host, int port, String request) {
         return tcpConnectionHandler.sendRequest(host, port, request);
     }
 
+    //River Section
+    public void registerWithRetentionBasin() {
+        String response = sendRequest(retentionBasinHost, retentionBasinPort, "ars:" + port);
+        if ("1".equals(response)) {
+            System.out.println("River Section registered with Retention Basin.");
+        } else {
+            System.err.println("Failed to register River Section with Retention Basin.");
+        }
+    }
     public void registerWithEnvironment() {
         String response = sendRequest(environmentHost, environmentPort, "rws:" + port);
         if ("1".equals(response)) {
@@ -75,8 +86,28 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
                 System.err.println("Invalid water flow value: " + request);
                 return "0"; // Failure response
             }
+        } else if(request.startsWith("arb:")) {
+            return processRegisterBasinRequest(request);
         }
         return "Unknown request";
+    }
+
+    private String processRegisterBasinRequest(String request) {
+        String[] parts = request.substring(4).split(",");
+        if (parts.length == 2) {
+            try {
+                int port = Integer.parseInt(parts[0].trim());
+                String host = parts[1].trim();
+                assignRetensionBasin(port, host);
+                return "1"; // Response code 1 for success
+            } catch (NumberFormatException ex) {
+                System.err.println("Invalid port format: " + parts[0]);
+                return "0"; // Response code 0 for failure
+            }
+        } else {
+            System.err.println("Invalid registration format: " + request);
+            return "0"; // Response code 0 for failure
+        }
     }
 
     public void shutdown() {

@@ -35,6 +35,7 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
     @Override
     public void start() {
         registerWithControlCenter();
+        registerWithIncomingRiverSections();
         executor.submit(() -> tcpConnectionHandler.startServer(port, this));
     }
 
@@ -62,14 +63,31 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         }
     }
 
+    //Assign outgoing river section
     @Override
     public void assignRiverSection(int port, String host) {
         this.outgoingRiverSectionPort = port;
         this.host = host;
     }
+    public void registerWithIncomingRiverSections() {
+        for (int port : incomingRiverSectionPorts) {
+            String response = sendRequest(host, port, "arb:" + this.port + "," + this.host);
+            if ("1".equals(response)) {
+                System.out.println("Retension Basin registered with River Section on port " + port);
+            } else {
+                System.err.println("Failed to register Retension Basin with River Section on port " + port);
+            }
+        }
+    }
 
-    public void addIncomingRiverSectionPort(int port) {
+    @Override
+    public void addIncomingRiverSection(String host, int port) {
+        if(incomingRiverSectionPorts.contains(port)) {
+            System.out.println(STR."Incoming river section already added: \{host}:\{port}");
+            return;
+        }
         incomingRiverSectionPorts.add(port);
+        System.out.println(STR."Added incoming river section: \{host}:\{port}");
     }
 
     public void setOutgoingRiverSectionPort(int port) {
@@ -108,23 +126,22 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
             int waterInflow = Integer.parseInt(parts[1]);
             setWaterInflow(waterInflow, port);
             return "1"; // Success response
-        } else if (request.startsWith("arb:")) {
-            return processRegisterBasinRequest(request);
+        } else if (request.startsWith("ars:")) {
+            return processRegisterIncomingRiverSectionRequest(request);
         }
         return "Unknown request";
     }
 
-    private String processRegisterBasinRequest(String request) {
+    // Register incoming river section
+    private String processRegisterIncomingRiverSectionRequest(String request) {
         String[] parts = request.substring(4).split(",");
         if (parts.length == 2) {
             try {
                 int port = Integer.parseInt(parts[0].trim());
                 String host = parts[1].trim();
-                String basin = host + ":" + port;
 
                 if (!incomingRiverSectionPorts.contains(port)) {
-                    incomingRiverSectionPorts.add(port);
-                    System.out.println("Registered incoming river section: " + basin);
+                    assignRiverSection(port, host);
                 }
                 return "1"; // Response code 1 for success
             } catch (NumberFormatException ex) {
