@@ -1,5 +1,7 @@
 package pl.edu.pwr.mrodak.jp.ControlCenter;
 
+import pl.edu.pwr.mrodak.jp.Observer;
+
 public interface IControlCenter {
     void assignRetensionBasin(int port, String host);
     void monitorBasins();

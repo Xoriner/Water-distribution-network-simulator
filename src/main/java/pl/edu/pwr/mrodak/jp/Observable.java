@@ -1,4 +1,4 @@
-package pl.edu.pwr.mrodak.jp.ControlCenter;
+package pl.edu.pwr.mrodak.jp;
 
 import java.util.ArrayList;
 import java.util.List;

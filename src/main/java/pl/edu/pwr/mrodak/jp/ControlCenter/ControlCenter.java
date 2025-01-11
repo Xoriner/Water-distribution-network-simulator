@@ -1,8 +1,9 @@
 package pl.edu.pwr.mrodak.jp.ControlCenter;
 
+import pl.edu.pwr.mrodak.jp.Observable;
+import pl.edu.pwr.mrodak.jp.Observer;
 import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.*;
 

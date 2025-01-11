@@ -1,6 +1,6 @@
 package pl.edu.pwr.mrodak.jp.Environment;
 
-import pl.edu.pwr.mrodak.jp.ControlCenter.Observer;
+import pl.edu.pwr.mrodak.jp.Observer;
 
 public interface IEnvironment {
     void assignRiverSection(int port, String host);

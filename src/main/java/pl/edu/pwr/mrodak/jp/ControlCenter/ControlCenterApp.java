@@ -1,5 +1,7 @@
 package pl.edu.pwr.mrodak.jp.ControlCenter;
 
+import pl.edu.pwr.mrodak.jp.Observer;
+
 import javax.swing.*;
 import java.awt.*;
 

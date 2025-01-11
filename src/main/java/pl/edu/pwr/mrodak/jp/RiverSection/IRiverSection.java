@@ -1,4 +1,4 @@
-package pl.edu.pwr.mrodak.jp.Environment;
+package pl.edu.pwr.mrodak.jp.RiverSection;
 
 public interface IRiverSection {
     void setRealDischarge(int realDischarge);

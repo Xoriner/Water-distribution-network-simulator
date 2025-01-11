@@ -1,7 +1,7 @@
 package pl.edu.pwr.mrodak.jp.Environment;
 
-import pl.edu.pwr.mrodak.jp.ControlCenter.Observable;
-import pl.edu.pwr.mrodak.jp.ControlCenter.Observer;
+import pl.edu.pwr.mrodak.jp.Observable;
+import pl.edu.pwr.mrodak.jp.Observer;
 
 import java.util.HashMap;
 import java.util.Map;

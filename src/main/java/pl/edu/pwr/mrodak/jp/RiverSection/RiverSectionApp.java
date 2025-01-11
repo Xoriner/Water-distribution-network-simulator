@@ -1,12 +1,7 @@
-package pl.edu.pwr.mrodak.jp.Environment;
-
-import pl.edu.pwr.mrodak.jp.RetensionBasin.RetensionBasinApp;
+package pl.edu.pwr.mrodak.jp.RiverSection;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class RiverSectionApp  extends JFrame {
     private JTextField delayInput;
@@ -89,7 +84,7 @@ public class RiverSectionApp  extends JFrame {
             String basinHost = basinHostInput.getText();
             int basinPort = Integer.parseInt(basinPortInput.getText());
 
-            riverSection = new RiverSection(port);
+            riverSection = new RiverSection("localhost", port, delay);
             riverSection.assignRetensionBasin(basinPort, basinHost);
         } catch(NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Invalid input", "Error", JOptionPane.ERROR_MESSAGE);
