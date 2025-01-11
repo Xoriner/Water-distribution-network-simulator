@@ -4,15 +4,12 @@ import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class ControlCenter extends Observable implements IControlCenter, TcpConnectionHandler.RequestHandler {
     private String host;
     private int port;
-    private Map<Integer, String> retensionBasins = new HashMap<>();
+    private Map<Integer, String> retensionBasins = new ConcurrentHashMap<>();
     private ScheduledExecutorService scheduler;
     private ExecutorService executor;
     private TcpConnectionHandler tcpConnectionHandler;

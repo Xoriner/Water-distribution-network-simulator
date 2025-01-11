@@ -4,6 +4,7 @@ import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,7 +19,7 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
     private ExecutorService executor;
     private TcpConnectionHandler tcpConnectionHandler;
 
-    private List<Integer> incomingRiverSectionPorts = new ArrayList<>();
+    private List<Integer> incomingRiverSectionPorts = new CopyOnWriteArrayList<>();
     private int outgoingRiverSectionPort;
 
     public RetensionBasin(int maxVolume, String host, int port, String controlCenterHost, int controlCenterPort) {

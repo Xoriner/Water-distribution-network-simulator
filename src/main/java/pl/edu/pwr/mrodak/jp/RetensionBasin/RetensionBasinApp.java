@@ -2,10 +2,8 @@ package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeUnit;
 
 public class RetensionBasinApp extends JFrame {

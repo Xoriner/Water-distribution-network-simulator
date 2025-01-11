@@ -1,11 +1,14 @@
 package pl.edu.pwr.mrodak.jp.Environment;
 
+import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
+
 import java.io.*;
 import java.net.*;
 
-public class RiverSection implements IRiverSection {
+public class RiverSection implements IRiverSection, TcpConnectionHandler {
     private String host;
     private int port;
+
     private int realDischarge;
     private int rainfall;
     private String retensionBasinHost;
