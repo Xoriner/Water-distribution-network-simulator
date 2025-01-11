@@ -2,6 +2,11 @@ package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeUnit;
 
 public class RetensionBasinApp extends JFrame {
     private JTextField hostInput;
@@ -12,12 +17,18 @@ public class RetensionBasinApp extends JFrame {
     private JLabel fillingPercentageLabel;
     private JLabel waterDischargeLabel;
     private RetensionBasin retensionBasin;
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public RetensionBasinApp() {
         setTitle("Retension Basin Configuration");
         setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
+        initializeUI();
+        setVisible(true);
+    }
+
+    private void initializeUI() {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -86,8 +97,6 @@ public class RetensionBasinApp extends JFrame {
         gbc.gridx = 1;
         waterDischargeLabel = new JLabel("N/A");
         add(waterDischargeLabel, gbc);
-
-        setVisible(true);
     }
 
     private void startRetensionBasin() {
@@ -100,16 +109,19 @@ public class RetensionBasinApp extends JFrame {
 
             retensionBasin = new RetensionBasin(maxVolume, host, port, controlCenterHost, controlCenterPort);
             retensionBasin.start();
+            updateLabels();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Invalid input. Please check your entries.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void updateLabels() {
-        if (retensionBasin != null) {
-            fillingPercentageLabel.setText(retensionBasin.getFillingPercentage() + "%");
-            waterDischargeLabel.setText(retensionBasin.getWaterDischarge() + " L/s");
-        }
+        scheduler.scheduleAtFixedRate(() -> {
+            if (retensionBasin != null) {
+                fillingPercentageLabel.setText(retensionBasin.getFillingPercentage() + "%");
+                waterDischargeLabel.setText(retensionBasin.getWaterDischarge() + " L/s");
+            }
+        }, 0, 2, TimeUnit.SECONDS);
     }
 
     public static void main(String[] args) {

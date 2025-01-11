@@ -10,4 +10,6 @@ public interface IControlCenter {
     void startServer();
 
     void start();
+
+    void setWaterDischarge(int port, int waterDischarge);
 }

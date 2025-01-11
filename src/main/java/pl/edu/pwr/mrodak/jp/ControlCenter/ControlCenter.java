@@ -137,6 +137,15 @@ public class ControlCenter extends Observable implements IControlCenter {
         }
     }
 
+    public void setWaterDischarge(int port, int waterDischarge) {
+        String host = retensionBasins.get(port);
+        if (host != null) {
+            sendRequest(host, port, "swd:" + waterDischarge);
+        } else {
+            System.err.println("No retension basin found on port: " + port);
+        }
+    }
+
     public void shutdown() {
         try {
             if (serverSocket != null && !serverSocket.isClosed()) {

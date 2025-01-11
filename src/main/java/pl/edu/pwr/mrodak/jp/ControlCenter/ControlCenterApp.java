@@ -5,6 +5,8 @@ import java.awt.*;
 
 public class ControlCenterApp extends JFrame implements Observer {
     private JTextField controlCenterPortField;
+    private JTextField basinPortField;
+    private JTextField waterDischargeField;
     private DefaultListModel<String> listModel;
     private IControlCenter controlCenter;
 
@@ -53,6 +55,31 @@ public class ControlCenterApp extends JFrame implements Observer {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         add(listScrollPane, gbc);
+
+        // Basin Port input
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("Basin Port:"), gbc);
+        gbc.gridx = 1;
+        basinPortField = new JTextField();
+        add(basinPortField, gbc);
+
+        // Water Discharge input
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        add(new JLabel("Water Discharge (L/s):"), gbc);
+        gbc.gridx = 1;
+        waterDischargeField = new JTextField();
+        add(waterDischargeField, gbc);
+
+        // Set Water Discharge button
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 2;
+        JButton setWaterDischargeButton = new JButton("Set Water Discharge");
+        setWaterDischargeButton.addActionListener(e -> setWaterDischarge());
+        add(setWaterDischargeButton, gbc);
     }
 
     private void startControlCenter() {
@@ -67,6 +94,20 @@ public class ControlCenterApp extends JFrame implements Observer {
         controlCenter = new ControlCenter("localhost", port);
         controlCenter.addObserver(this);
         controlCenter.start();
+    }
+
+    private void setWaterDischarge() {
+        int port;
+        int waterDischarge;
+        try {
+            port = Integer.parseInt(basinPortField.getText());
+            waterDischarge = Integer.parseInt(waterDischargeField.getText());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid input.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        controlCenter.setWaterDischarge(port, waterDischarge);
     }
 
     @Override
