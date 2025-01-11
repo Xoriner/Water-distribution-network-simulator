@@ -54,4 +54,8 @@ public class ControlCenter implements IControlCenter {
             return null;
         }
     }
+
+    public Map<Integer, String> getRetensionBasins() {
+        return retensionBasins;
+    }
 }

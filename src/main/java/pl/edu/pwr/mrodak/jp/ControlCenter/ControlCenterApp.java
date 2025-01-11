@@ -13,6 +13,7 @@ import java.util.concurrent.Executors;
 public class ControlCenterApp extends JFrame {
     private JTextField controlCenterPortField;
     private DefaultListModel<String> listModel;
+    private IControlCenter controlCenter;
     private ServerSocket serverSocket;
     private ExecutorService executor;
 
@@ -70,6 +71,10 @@ public class ControlCenterApp extends JFrame {
             return;
         }
 
+        //TO-DO: Implement ControlCenter host
+        controlCenter = new ControlCenter("localhost", port);
+        controlCenter.monitorBasins();
+
         executor = Executors.newCachedThreadPool();
         try {
             serverSocket = new ServerSocket(port);
@@ -116,6 +121,7 @@ public class ControlCenterApp extends JFrame {
 
                         if (!listModel.contains(basin)) {
                             listModel.addElement(basin); // Add basin to GUI list
+                            controlCenter.assignRetensionBasin(port, host); // Add basin to Control Center
                         }
 
                         // Respond to confirm registration
