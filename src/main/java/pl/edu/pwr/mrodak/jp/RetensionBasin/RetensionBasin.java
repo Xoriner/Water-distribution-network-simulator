@@ -3,7 +3,7 @@ package pl.edu.pwr.mrodak.jp.RetensionBasin;
 import java.io.*;
 import java.net.*;
 
-public class RetensionBasin {
+public class RetensionBasin implements IRetensionBasin {
     private int maxVolume;
     private String host;
     private int port;
@@ -25,9 +25,42 @@ public class RetensionBasin {
         return waterDischarge;
     }
 
-    public int getFillingPercentage() {
+    public long getFillingPercentage() {
         currentVolume = currentVolume + 10;
         return (int) ((double) currentVolume / maxVolume * 100);
+    }
+
+    @Override
+    public void setWaterDischarge(int waterDischarge) {
+        this.waterDischarge = waterDischarge;
+    }
+
+    @Override
+    public void setWaterInflow(int waterInflow, int port) {
+        try (Socket socket = new Socket(host, port);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true)) {
+            out.println("srd:" + waterInflow);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void assignRiverSection(int port, String host) {
+
+    }
+
+    private String sendRequest(String host, int port, String request) {
+        try (Socket socket = new Socket(host, port);
+             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
+
+            out.println(request);
+            return in.readLine();
+        } catch (IOException e) {
+            System.err.println("Error connecting to " + host + ":" + port + " - " + e.getMessage());
+            return null;
+        }
     }
 
     public void registerWithControlCenter() {
@@ -69,6 +102,14 @@ public class RetensionBasin {
             return String.valueOf(getFillingPercentage());
         } else if ("gwd".equals(request)) {
             return String.valueOf(getWaterDischarge());
+        } else if("swd".equals(request)) {
+            setWaterDischarge(Integer.parseInt(request.substring(4)));
+        }
+        else if(request.startsWith("swi:")) {
+            String[] parts = request.substring(4).split(",");
+            int port = Integer.parseInt(parts[0]);
+            int waterInflow = Integer.parseInt(parts[1]);
+            setWaterInflow(waterInflow, port);
         }
         return "Unknown request";
     }

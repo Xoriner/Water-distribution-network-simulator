@@ -4,13 +4,17 @@ import java.io.*;
 import java.net.*;
 
 public class RiverSection implements IRiverSection {
+    private String host;
+    private int port;
     private int realDischarge;
     private int rainfall;
     private String retensionBasinHost;
     private int retensionBasinPort;
 
     public RiverSection(int port) {
-        new Thread(() -> startServer(port)).start();
+        this.realDischarge = 0;
+        this.rainfall = 0;
+        new Thread(this::startServer).start();
     }
 
     @Override
@@ -29,7 +33,7 @@ public class RiverSection implements IRiverSection {
         this.retensionBasinHost = host;
     }
 
-    private void startServer(int port) {
+    private void startServer() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             while (true) {
                 try (Socket clientSocket = serverSocket.accept();
