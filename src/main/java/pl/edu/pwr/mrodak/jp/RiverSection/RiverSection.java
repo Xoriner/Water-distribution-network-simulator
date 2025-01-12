@@ -140,6 +140,16 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
             //getRainfall
             System.out.println("Rainfall: " + getRainfall());
             return String.valueOf(getRainfall());
+        } else if(request.startsWith("srf:")) {
+            //setRainfall
+            try {
+                int rainFall = Integer.parseInt(request.substring(4));
+                setRainfall(rainFall);
+                return "1"; // Success response
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid rainfall value: " + request);
+                return "0"; // Failure response
+            }
         }
         return "Unknown request";
     }

@@ -59,6 +59,16 @@ public class Environment extends Observable implements IEnvironment, TcpConnecti
     }
 
     @Override
+    public void setRainFall(int port, int rainFall) {
+        String host = riverSections.get(port);
+        if (host != null) {
+            tcpConnectionHandler.sendRequest(host, port, "srf:" + rainFall);
+        } else {
+            System.err.println("No river section found on port: " + port);
+        }
+    }
+
+    @Override
     public String handleRequest(String request) {
         //Ars:port,host Assign river section request
         if (request != null && request.startsWith("ars:")) {

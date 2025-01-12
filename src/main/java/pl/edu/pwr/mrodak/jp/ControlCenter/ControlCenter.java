@@ -94,6 +94,7 @@ public class ControlCenter extends Observable implements IControlCenter, TcpConn
         }
     }
 
+    @Override
     public void setWaterDischarge(int port, int waterDischarge) {
         String host = retensionBasins.get(port);
         if (host != null) {

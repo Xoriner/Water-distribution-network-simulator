@@ -9,4 +9,6 @@ public interface IEnvironment {
     void monitorRiverSections();
     void addObserver(Observer observer);
     void removeObserver(Observer observer);
+
+    void setRainFall(int port, int rainFall);
 }

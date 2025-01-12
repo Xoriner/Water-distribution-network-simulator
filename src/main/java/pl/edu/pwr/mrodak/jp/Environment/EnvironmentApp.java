@@ -14,6 +14,8 @@ import java.util.concurrent.Executors;
 
 public class EnvironmentApp extends JFrame implements Observer {
     private JTextField environmentPortField;
+    private JTextField riverPortField;
+    private JTextField riverRainFallField;
     private DefaultListModel<String> listModel;
     private IEnvironment environment;
 
@@ -62,6 +64,32 @@ public class EnvironmentApp extends JFrame implements Observer {
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
         add(listScrollPane, gbc);
+
+        // River Port input
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        add(new JLabel("River Port:"), gbc);
+        gbc.gridx = 1;
+        riverPortField = new JTextField();
+        add(riverPortField, gbc);
+
+        // River rainFall input
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        add(new JLabel("Rainfall (m3):"), gbc);
+        gbc.gridx = 1;
+        riverRainFallField = new JTextField();
+        add(riverRainFallField, gbc);
+
+        // Set Water Discharge button
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        gbc.gridwidth = 2;
+        JButton setRainFall = new JButton("Set Rain Fall");
+        setRainFall.addActionListener(e -> setRainFall());
+        add(setRainFall, gbc);
+
     }
 
     private void startEnvironment() {
@@ -76,6 +104,20 @@ public class EnvironmentApp extends JFrame implements Observer {
         environment = new Environment("localhost", port);
         environment.addObserver(this);
         environment.start();
+    }
+
+    private void setRainFall() {
+        int port;
+        int rainFall;
+        try {
+            port = Integer.parseInt(riverPortField.getText());
+            rainFall = Integer.parseInt(riverRainFallField.getText());
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid input.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        environment.setRainFall(port, rainFall);
     }
 
 
