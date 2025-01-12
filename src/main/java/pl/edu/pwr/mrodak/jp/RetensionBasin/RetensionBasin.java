@@ -50,6 +50,8 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         currentVolume += totalInflow - waterDischarge;
         if (currentVolume > maxVolume) {
             currentVolume = maxVolume;
+            //CHANGE THIS PROBABLY
+            waterDischarge = totalInflow;
         } else if (currentVolume < 0) {
             currentVolume = 0;
         }

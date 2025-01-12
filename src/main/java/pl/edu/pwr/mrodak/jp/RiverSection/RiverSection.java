@@ -21,7 +21,8 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     private ScheduledExecutorService scheduler;
     private TcpConnectionHandler tcpConnectionHandler;
 
-    private int rainFall;
+    //get Rainfall from Environment
+    private int rainFall = 10;
 
     private String outputBasinHost;
     private int outputBasinPort;
@@ -45,6 +46,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
         //registerWithInputRetentionBasin();
         executor.submit(() -> tcpConnectionHandler.startServer(port, this));
         monitorOutputRetentionBasin();
+        scheduler.scheduleAtFixedRate(this::calculateAndSendWaterInflow, 0, delay, TimeUnit.MILLISECONDS);
     }
     @Override
     public void setRealDischarge(int realDischarge) {
@@ -56,7 +58,19 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
         this.rainFall = rainfall;
     }
 
-
+    public void sendWaterInflowToOutputBasin(int waterInflow) {
+        if (outputBasinHost != null && outputBasinPort > 0) {
+            String request = "swi:" + port + "," + waterInflow;
+            String response = sendRequest(outputBasinHost, outputBasinPort, request);
+            if ("1".equals(response)) {
+                System.out.println("Water inflow sent to output basin: " + waterInflow);
+            } else {
+                System.err.println("Failed to send water inflow to output basin.");
+            }
+        } else {
+            System.err.println("Output basin not assigned.");
+        }
+    }
 
     //RetentionBasin at the end of the river section
     @Override
@@ -73,6 +87,14 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
         }, 0, 2, TimeUnit.SECONDS);
     }
 
+    private void calculateAndSendWaterInflow() {
+        int waterInflow = calculateWaterInflow();
+        sendWaterInflowToOutputBasin(waterInflow);
+    }
+
+    private int calculateWaterInflow() {
+        return rainFall;
+    }
 
     private String sendRequest(String host, int port, String request) {
         System.out.println("Sending request to " + host + ":" + port + ": " + request);
