@@ -80,6 +80,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     }
     @Override
     public String handleRequest(String request) {
+        //System.out.println(request);
         if ("gwf".equals(request)) {
             return String.valueOf(1);//TODO: Implement this method
         } else if (request.startsWith("swf:")) {
@@ -92,7 +93,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
             }
         } else if(request.startsWith("arb:")) { //assignRetensionBasin
             return processRegisterBasinRequest(request);
-        } else if(request.startsWith("grf:")) {
+        } else if(request.equals("grf")) {
             //getRainfall
             System.out.println("Rainfall: " + getRainfall());
             return String.valueOf(getRainfall());

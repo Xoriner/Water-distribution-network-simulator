@@ -16,8 +16,6 @@ public class EnvironmentApp extends JFrame implements Observer {
     private JTextField environmentPortField;
     private DefaultListModel<String> listModel;
     private IEnvironment environment;
-    private ServerSocket serverSocket;
-    private ExecutorService executor;
 
     public EnvironmentApp() {
         setTitle("Environment Monitoring");
@@ -45,8 +43,8 @@ public class EnvironmentApp extends JFrame implements Observer {
         gbc.gridx = 0;
         gbc.gridy = 1;
         gbc.gridwidth = 2;
-        JButton startButton = new JButton("Start Environment Monitoring");
-        startButton.addActionListener(e -> startEnvironmentMonitoring());
+        JButton startButton = new JButton("Start Environment");
+        startButton.addActionListener(e -> startEnvironment());
         add(startButton, gbc);
 
         // List of monitored sections
@@ -66,7 +64,7 @@ public class EnvironmentApp extends JFrame implements Observer {
         add(listScrollPane, gbc);
     }
 
-    private void startEnvironmentMonitoring() {
+    private void startEnvironment() {
         int port;
         try {
             port = Integer.parseInt(environmentPortField.getText());
