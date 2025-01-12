@@ -41,9 +41,9 @@ public class Environment extends Observable implements IEnvironment, TcpConnecti
                 int sectionPort = entry.getKey();
                 String sectionHost = entry.getValue();
 
-                String rainFall = tcpConnectionHandler.sendRequest(sectionHost, sectionPort, "grf");
+                int rainFall = Integer.parseInt(tcpConnectionHandler.sendRequest(sectionHost, sectionPort, "grf"));
                 System.out.println("Rainfall: " + rainFall);
-                //notifyObservers(sectionHost, sectionPort, waterQuality, waterLevel);
+                notifyObservers(sectionHost, sectionPort, "", rainFall);
             }
         }, 0, 2, TimeUnit.SECONDS);
     }

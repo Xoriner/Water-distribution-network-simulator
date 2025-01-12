@@ -14,9 +14,9 @@ public class Observable {
         observers.remove(observer);
     }
 
-    protected void notifyObservers(String host, int port, String fillStatus, int waterDischarge) {
+    protected void notifyObservers(String host, int port, String stringInfo, int infInfo) {
         for (Observer observer : observers) {
-            observer.update(host, port, fillStatus, waterDischarge);
+            observer.update(host, port, stringInfo, infInfo);
         }
     }
 }

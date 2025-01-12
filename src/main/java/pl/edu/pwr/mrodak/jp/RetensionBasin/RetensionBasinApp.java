@@ -24,7 +24,7 @@ public class RetensionBasinApp extends JFrame {
 
     public RetensionBasinApp() {
         setTitle("Retension Basin Configuration");
-        setSize(600, 600);
+        setSize(680, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
         initializeUI();
@@ -96,7 +96,7 @@ public class RetensionBasinApp extends JFrame {
         gbc.gridx = 0;
         gbc.gridy = 8;
         gbc.gridwidth = 2;
-        JButton startButton = new JButton("Start Retension Basin");
+        JButton startButton = new JButton("Start Retension Basin and Connect with Central Control");
         startButton.addActionListener(e -> startRetensionBasin());
         add(startButton, gbc);
 
@@ -149,11 +149,23 @@ public class RetensionBasinApp extends JFrame {
                 add(portInput, gbc);
             }
 
+            gbc.gridx = 2;
+            gbc.gridy = 2 + amount * 2;
+            JButton connectToInputRivers = new JButton("Connect to Incoming River Sections");
+            connectToInputRivers.addActionListener(e -> connectToInputRivers());
+            add(connectToInputRivers, gbc);
+
             revalidate();
             repaint();
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(this, "Invalid amount. Please enter a valid number.", "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void connectToInputRivers() {
+        // Read inputs for incoming river sections
+        readIncomingRiverSectionInputs();
+        retensionBasin.connectWithIncomingRiverSections();
     }
 
     private void readIncomingRiverSectionInputs() {
@@ -177,10 +189,6 @@ public class RetensionBasinApp extends JFrame {
             int controlCenterPort = Integer.parseInt(controlCenterPortInput.getText());
 
             retensionBasin = new RetensionBasin(maxVolume, host, port, controlCenterHost, controlCenterPort);
-
-            // Read inputs for incoming river sections
-            readIncomingRiverSectionInputs();
-
             retensionBasin.start();
             updateLabels();
         } catch (NumberFormatException e) {

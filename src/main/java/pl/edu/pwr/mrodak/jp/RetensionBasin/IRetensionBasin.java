@@ -14,4 +14,6 @@ public interface IRetensionBasin {
     void assignRiverSection(int port, String host);
 
     void addIncomingRiverSection(String riverHost, int riverPort);
+
+    void connectWithIncomingRiverSections();
 }

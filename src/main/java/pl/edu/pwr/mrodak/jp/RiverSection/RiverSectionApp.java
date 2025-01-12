@@ -13,6 +13,8 @@ public class RiverSectionApp  extends JFrame implements Observer {
     private JTextField basinHostInput;
     private JTextField basinPortInput;
     private IRiverSection riverSection;
+    private JLabel outputBasinHostLabel;
+    private JLabel outputBasinPortLabel;
 
     public RiverSectionApp() {
         setTitle("River Section Configuration");
@@ -63,7 +65,7 @@ public class RiverSectionApp  extends JFrame implements Observer {
         //Basin Host Input
         gbc.gridx = 0;
         gbc.gridy = 4;
-        add(new JLabel("Basin Host:"), gbc);
+        add(new JLabel("Input Basin Host:"), gbc);
         gbc.gridx = 1;
         basinHostInput = new JTextField("localhost");
         add(basinHostInput, gbc);
@@ -71,7 +73,7 @@ public class RiverSectionApp  extends JFrame implements Observer {
         //Basin Port Input
         gbc.gridx = 0;
         gbc.gridy = 5;
-        add(new JLabel("Basin Port:"), gbc);
+        add(new JLabel("Input Basin Port:"), gbc);
         gbc.gridx = 1;
         basinPortInput = new JTextField("8082");
         add(basinPortInput, gbc);
@@ -83,6 +85,22 @@ public class RiverSectionApp  extends JFrame implements Observer {
         JButton startButton = new JButton("Start River Section");
         startButton.addActionListener(e -> startRiverSection());
         add(startButton, gbc);
+
+        // Output Basin Host Label
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        add(new JLabel("Output Basin Host:"), gbc);
+        gbc.gridx = 1;
+        outputBasinHostLabel = new JLabel("N/A");
+        add(outputBasinHostLabel, gbc);
+
+        // Output Basin Port Label
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        add(new JLabel("Output Basin Port:"), gbc);
+        gbc.gridx = 1;
+        outputBasinPortLabel = new JLabel("N/A");
+        add(outputBasinPortLabel, gbc);
     }
 
     private void startRiverSection() {
@@ -91,10 +109,10 @@ public class RiverSectionApp  extends JFrame implements Observer {
             int port = Integer.parseInt(portInput.getText());
             String envHost = envHostInput.getText();
             int envPort = Integer.parseInt(envPortInput.getText());
-            String basinHost = basinHostInput.getText();
-            int basinPort = Integer.parseInt(basinPortInput.getText());
+            String inputBasinHost = basinHostInput.getText();
+            int inputBasinPort = Integer.parseInt(basinPortInput.getText());
 
-            riverSection = new RiverSection(delay, port, envHost, envPort, basinHost, basinPort);
+            riverSection = new RiverSection(delay, port, envHost, envPort, inputBasinHost, inputBasinPort);
             riverSection.addObserver(this);
             riverSection.start();
         } catch(NumberFormatException e) {
@@ -102,13 +120,17 @@ public class RiverSectionApp  extends JFrame implements Observer {
         }
     }
 
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(RiverSectionApp::new);
-    }
-
     @Override
     //TODO: Implement this method
-    public void update(String host, int port, String fillStatus, int waterDischarge) {
+    public void update(String host, int port, String stringInfo, int intInfo) {
+        SwingUtilities.invokeLater(() -> {
+            System.out.println("Host: " + host + ", Port: " + port + ", String: " + stringInfo + ", Int: " + intInfo);
+            outputBasinHostLabel.setText(host);
+            outputBasinPortLabel.setText(String.valueOf(port));
+        });
+    }
 
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(RiverSectionApp::new);
     }
 }

@@ -39,6 +39,12 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         scheduler.scheduleAtFixedRate(this::updateCurrentVolume, 0, 2, TimeUnit.SECONDS);
     }
 
+    @Override
+    public void connectWithIncomingRiverSections() {
+        System.out.println("Connecting with incoming river sections");
+        registerWithIncomingRiverSections();
+    }
+
     private void updateCurrentVolume() {
         int totalInflow = inflows.values().stream().mapToInt(Integer::intValue).sum();
         currentVolume += totalInflow - waterDischarge;

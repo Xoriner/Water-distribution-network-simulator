@@ -105,9 +105,9 @@ public class EnvironmentApp extends JFrame implements Observer {
     }
 
     @Override
-    public void update(String host, int port, String waterQuality, int waterLevel) {
+    public void update(String host, int port, String stringInfo, int rainFall) {
         SwingUtilities.invokeLater(() -> {
-            String displayText = host + ":" + port + " - Water Quality: " + waterQuality + ", Water Level: " + waterLevel + "cm";
+            String displayText = host + ":" + port + " - Rainfall: " + rainFall;
             boolean updated = false;
             for (int i = 0; i < listModel.size(); i++) {
                 if (listModel.get(i).startsWith(host + ":" + port)) {
