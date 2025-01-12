@@ -121,7 +121,6 @@ public class RiverSectionApp  extends JFrame implements Observer {
     }
 
     @Override
-    //TODO: Implement this method
     public void update(String host, int port, String stringInfo, int intInfo) {
         SwingUtilities.invokeLater(() -> {
             System.out.println("Host: " + host + ", Port: " + port + ", String: " + stringInfo + ", Int: " + intInfo);

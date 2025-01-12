@@ -1,5 +1,7 @@
 package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
+import pl.edu.pwr.mrodak.jp.Observer;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
@@ -8,7 +10,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class RetensionBasinApp extends JFrame {
+public class RetensionBasinApp extends JFrame implements Observer {
     private JTextField hostInput;
     private JTextField portInput;
     private JTextField maxVolumeInput;
@@ -19,12 +21,16 @@ public class RetensionBasinApp extends JFrame {
     private JLabel waterDischargeLabel;
     private IRetensionBasin retensionBasin;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+    private JLabel outputRiverHostLabel;
+    private JLabel outputRiverPortLabel;
+
     private List<JTextField> incomingRiverSectionHostInputs = new ArrayList<>();
     private List<JTextField> incomingRiverSectionPortInputs = new ArrayList<>();
 
     public RetensionBasinApp() {
         setTitle("Retension Basin Configuration");
-        setSize(680, 600);
+        setSize(700, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new GridBagLayout());
         initializeUI();
@@ -94,15 +100,43 @@ public class RetensionBasinApp extends JFrame {
 
         // Start Button
         gbc.gridx = 0;
-        gbc.gridy = 8;
+        gbc.gridy = 5;
         gbc.gridwidth = 2;
         JButton startButton = new JButton("Start Retension Basin and Connect with Central Control");
         startButton.addActionListener(e -> startRetensionBasin());
         add(startButton, gbc);
 
-        // Filling Percentage Label
+
+        //Output River Section
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        add(new JLabel("Output RiverSection:"), gbc);
+
+        // Output River Host Label
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        add(new JLabel("Output River Host:"), gbc);
+        gbc.gridx = 1;
+        outputRiverHostLabel = new JLabel("N/A");
+        add(outputRiverHostLabel, gbc);
+
+        // Output River Port Label
+        gbc.gridx = 0;
+        gbc.gridy = 8;
+        add(new JLabel("Output River Port:"), gbc);
+        gbc.gridx = 1;
+        outputRiverPortLabel = new JLabel("N/A");
+        add(outputRiverPortLabel, gbc);
+
+
+        // Retension Basin Info
         gbc.gridx = 0;
         gbc.gridy = 9;
+        add(new JLabel("Retension Basin Info:"), gbc);
+
+        // Filling Percentage Label
+        gbc.gridx = 0;
+        gbc.gridy = 10;
         gbc.gridwidth = 1;
         add(new JLabel("Filling Percentage:"), gbc);
         gbc.gridx = 1;
@@ -111,7 +145,7 @@ public class RetensionBasinApp extends JFrame {
 
         // Water Discharge Label
         gbc.gridx = 0;
-        gbc.gridy = 10;
+        gbc.gridy = 11;
         add(new JLabel("Water Discharge:"), gbc);
         gbc.gridx = 1;
         waterDischargeLabel = new JLabel("N/A");
@@ -189,6 +223,7 @@ public class RetensionBasinApp extends JFrame {
             int controlCenterPort = Integer.parseInt(controlCenterPortInput.getText());
 
             retensionBasin = new RetensionBasin(maxVolume, host, port, controlCenterHost, controlCenterPort);
+            retensionBasin.addObserver(this);
             retensionBasin.start();
             updateLabels();
         } catch (NumberFormatException e) {
@@ -203,6 +238,15 @@ public class RetensionBasinApp extends JFrame {
                 waterDischargeLabel.setText(retensionBasin.getWaterDischarge() + " L/s");
             }
         }, 0, 2, TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void update(String host, int port, String stringInfo, int intInfo) {
+        SwingUtilities.invokeLater(() -> {
+            System.out.println("Host: " + host + ", Port: " + port + ", String: " + stringInfo + ", Int: " + intInfo);
+            outputRiverHostLabel.setText(host);
+            outputRiverPortLabel.setText(String.valueOf(port));
+        });
     }
 
     public static void main(String[] args) {

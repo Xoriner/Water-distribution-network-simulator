@@ -1,23 +1,25 @@
 package pl.edu.pwr.mrodak.jp.RetensionBasin;
 
+import pl.edu.pwr.mrodak.jp.Observable;
 import pl.edu.pwr.mrodak.jp.TcpConnectionHandler;
 
 import java.util.List;
 import java.util.concurrent.*;
 
-public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.RequestHandler {
+public class RetensionBasin extends Observable implements IRetensionBasin, TcpConnectionHandler.RequestHandler {
     private int maxVolume;
     private String host;
     private int port;
     private String controlCenterHost;
     private int controlCenterPort;
     private int currentVolume;
-    private int waterDischarge;
+    private int waterDischarge = 10;
     private ExecutorService executor;
     private ScheduledExecutorService scheduler;
     private TcpConnectionHandler tcpConnectionHandler;
 
     private List<Integer> incomingRiverSectionPorts = new CopyOnWriteArrayList<>();
+    private String outgoingRiverSectionHost;
     private int outgoingRiverSectionPort;
     private ConcurrentMap<Integer, Integer> inflows = new ConcurrentHashMap<>();
 
@@ -36,6 +38,7 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
     public void start() {
         registerWithControlCenter();
         executor.submit(() -> tcpConnectionHandler.startServer(port, this));
+        monitorOutgoingRiverSection();
         scheduler.scheduleAtFixedRate(this::updateCurrentVolume, 0, 2, TimeUnit.SECONDS);
     }
 
@@ -44,6 +47,7 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         System.out.println("Connecting with incoming river sections");
         registerWithIncomingRiverSections();
     }
+
 
     private void updateCurrentVolume() {
         int totalInflow = inflows.values().stream().mapToInt(Integer::intValue).sum();
@@ -80,11 +84,21 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         }
     }
 
+    //Assign the River Section (output for the Retention Basin)
     @Override
     public void assignRiverSection(int port, String host) {
         this.outgoingRiverSectionPort = port;
-        this.host = host;
+        this.outgoingRiverSectionHost = host;
+        System.out.println("Assigned output River Section: " + host + ":" + port);
+        notifyObservers(outgoingRiverSectionHost, outgoingRiverSectionPort, "", 0);
     }
+
+    public void monitorOutgoingRiverSection() {
+        scheduler.scheduleAtFixedRate(() -> {
+            notifyObservers(outgoingRiverSectionHost, outgoingRiverSectionPort, "", 0);
+        }, 0, 2, TimeUnit.SECONDS);
+    }
+
 
     //Send assignRetensionBasin request to the River Section (input for the Retension Basin)
     public void registerWithIncomingRiverSections() {
@@ -106,10 +120,6 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         }
         incomingRiverSectionPorts.add(port);
         System.out.println("Added incoming river section: " + host + ":" + port);
-    }
-
-    public void setOutgoingRiverSectionPort(int port) {
-        this.outgoingRiverSectionPort = port;
     }
 
     private void sendWaterDischargeToOutgoingSection() {
@@ -147,21 +157,19 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
             System.out.println("Water inflow set to " + waterInflow + " from river section on port " + port);
             return "1"; // Success response
         } else if (request.startsWith("ars:")) {
-            return processRegisterIncomingRiverSectionRequest(request);
+            System.out.println("Assign Output River Section request: " + request);
+            return processRegisterOutgoingRiverSectionRequest(request);
         }
         return "Unknown request";
     }
 
-    private String processRegisterIncomingRiverSectionRequest(String request) {
+    private String processRegisterOutgoingRiverSectionRequest(String request) {
         String[] parts = request.substring(4).split(",");
         if (parts.length == 2) {
             try {
                 int port = Integer.parseInt(parts[0].trim());
                 String host = parts[1].trim();
-
-                if (!incomingRiverSectionPorts.contains(port)) {
-                    assignRiverSection(port, host);
-                }
+                assignRiverSection(port, host);
                 return "1"; // Response code 1 for success
             } catch (NumberFormatException ex) {
                 System.err.println("Invalid port format: " + parts[0]);
@@ -178,5 +186,10 @@ public class RetensionBasin implements IRetensionBasin, TcpConnectionHandler.Req
         executor.shutdownNow();
         scheduler.shutdownNow();
         System.out.println("Retention Basin has been shut down.");
+    }
+
+    @Override
+    public void addObserver(RetensionBasinApp retensionBasinApp) {
+        super.addObserver(retensionBasinApp);
     }
 }

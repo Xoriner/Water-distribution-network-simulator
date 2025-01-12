@@ -115,7 +115,7 @@ public class ControlCenterApp extends JFrame implements Observer {
     @Override
     public void update(String host, int port, String fillStatus, int waterDischarge) {
         SwingUtilities.invokeLater(() -> {
-            String displayText = host + ":" + port + " - Fill: " + fillStatus + "%, Discharge: " + waterDischarge + "L";
+            String displayText = host + ":" + port + " - Fill: " + fillStatus + "%, Discharge: " + waterDischarge + "m3/s";
             boolean updated = false;
             for (int i = 0; i < listModel.size(); i++) {
                 if (listModel.get(i).startsWith(host + ":" + port)) {

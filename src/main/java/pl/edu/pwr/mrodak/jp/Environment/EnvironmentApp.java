@@ -120,32 +120,6 @@ public class EnvironmentApp extends JFrame implements Observer {
         environment.setRainFall(port, rainFall);
     }
 
-
-    //Get rid of this probably
-    private void processRegisterRiverSectionRequest(String request, PrintWriter out) {
-        String[] parts = request.substring(4).split(",");
-        if (parts.length == 2) {
-            try {
-                int port = Integer.parseInt(parts[0].trim());
-                String host = parts[1].trim();
-                String basin = host + ":" + port;
-
-                //TO-DO: FIX THE ERROR WITH CONTAINS
-                if (!listModel.contains(basin)) {
-                    listModel.addElement(basin); // Add basin to GUI list
-                    environment.assignRiverSection(port, host); // Add basin to Control Center
-                }
-                out.println("1"); // Response code 1 for success
-            } catch (NumberFormatException ex) {
-                out.println("0"); // Response code 0 for failure
-                System.err.println("Invalid port format: " + parts[0]);
-            }
-        } else {
-            out.println("0"); // Response code 0 for failure
-            System.err.println("Invalid registration format: " + request);
-        }
-    }
-
     @Override
     public void update(String host, int port, String stringInfo, int rainFall) {
         SwingUtilities.invokeLater(() -> {

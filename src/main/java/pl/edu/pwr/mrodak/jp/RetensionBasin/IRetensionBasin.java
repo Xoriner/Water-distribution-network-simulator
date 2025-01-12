@@ -16,4 +16,6 @@ public interface IRetensionBasin {
     void addIncomingRiverSection(String riverHost, int riverPort);
 
     void connectWithIncomingRiverSections();
+
+    void addObserver(RetensionBasinApp retensionBasinApp);
 }

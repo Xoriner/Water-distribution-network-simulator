@@ -23,6 +23,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
 
     //get Rainfall from Environment
     private int rainFall = 10;
+    private int realDischarge = 0;
 
     private String outputBasinHost;
     private int outputBasinPort;
@@ -43,14 +44,14 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     @Override
     public void start() {
         registerWithEnvironment();
-        //registerWithInputRetentionBasin();
         executor.submit(() -> tcpConnectionHandler.startServer(port, this));
         monitorOutputRetentionBasin();
         scheduler.scheduleAtFixedRate(this::calculateAndSendWaterInflow, 0, delay, TimeUnit.MILLISECONDS);
+        registerWithInputRetentionBasin();
     }
     @Override
     public void setRealDischarge(int realDischarge) {
-
+        this.realDischarge = realDischarge;
     }
 
     @Override
@@ -93,7 +94,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     }
 
     private int calculateWaterInflow() {
-        return rainFall;
+        return realDischarge + rainFall;
     }
 
     private String sendRequest(String host, int port, String request) {
@@ -103,7 +104,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
 
     //River Section
     public void registerWithInputRetentionBasin() {
-        String response = sendRequest(inputBasinHost, inputBasinPort, "ars:" + port);
+        String response = sendRequest(inputBasinHost, inputBasinPort, "ars:" + port + "," + "localhost");
         if ("1".equals(response)) {
             System.out.println("River Section registered with Retention Basin.");
         } else {
@@ -122,9 +123,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     @Override
     public String handleRequest(String request) {
         //System.out.println(request);
-        if ("gwf".equals(request)) {
-            return String.valueOf(1);//TODO: Implement this method
-        } else if (request.startsWith("swf:")) {
+        if (request.startsWith("swf:")) {
             try {
                 int flow = Integer.parseInt(request.substring(4));
                 return "1"; // Success response
@@ -148,6 +147,16 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
                 return "1"; // Success response
             } catch (NumberFormatException e) {
                 System.err.println("Invalid rainfall value: " + request);
+                return "0"; // Failure response
+            }
+        } else if(request.startsWith("srd:")) {
+            //setRealDischarge
+            try {
+                int realDischarge = Integer.parseInt(request.substring(4));
+                setRealDischarge(realDischarge);
+                return "1"; // Success response
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid real discharge value: " + request);
                 return "0"; // Failure response
             }
         }
