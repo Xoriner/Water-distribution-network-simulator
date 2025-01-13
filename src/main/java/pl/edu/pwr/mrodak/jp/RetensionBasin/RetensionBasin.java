@@ -96,7 +96,7 @@ public class RetensionBasin extends Observable implements IRetensionBasin, TcpCo
     public void monitorOutgoingRiverSection() {
         scheduler.scheduleAtFixedRate(() -> {
             notifyObservers(outgoingRiverSectionHost, outgoingRiverSectionPort, "", 0);
-        }, 0, 2, TimeUnit.SECONDS);
+        }, 0, 4, TimeUnit.SECONDS);
     }
 
 

@@ -49,7 +49,7 @@ public class ControlCenter extends Observable implements IControlCenter, TcpConn
                     notifyObservers(basinHost, basinPort, fillStatus, waterDischarge);
                 }
             }
-        }, 0, 2, TimeUnit.SECONDS);
+        }, 0, 4, TimeUnit.SECONDS);
     }
 
     @Override

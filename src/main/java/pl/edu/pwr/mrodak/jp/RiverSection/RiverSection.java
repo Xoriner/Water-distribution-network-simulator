@@ -22,7 +22,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     private TcpConnectionHandler tcpConnectionHandler;
 
     //get Rainfall from Environment
-    private int rainFall = 10;
+    private int rainFall = 20;
     private int realDischarge = 0;
 
     private String outputBasinHost;
@@ -85,7 +85,7 @@ public class RiverSection extends Observable implements IRiverSection, TcpConnec
     public void monitorOutputRetentionBasin() {
         scheduler.scheduleAtFixedRate(() -> {
             notifyObservers(outputBasinHost, outputBasinPort, "", 0);
-        }, 0, 2, TimeUnit.SECONDS);
+        }, 0, 4, TimeUnit.SECONDS);
     }
 
     private void calculateAndSendWaterInflow() {

@@ -235,7 +235,7 @@ public class RetensionBasinApp extends JFrame implements Observer {
         scheduler.scheduleAtFixedRate(() -> {
             if (retensionBasin != null) {
                 fillingPercentageLabel.setText(retensionBasin.getFillingPercentage() + "%");
-                waterDischargeLabel.setText(retensionBasin.getWaterDischarge() + " L/s");
+                waterDischargeLabel.setText(retensionBasin.getWaterDischarge() + " m3/s");
             }
         }, 0, 2, TimeUnit.SECONDS);
     }
