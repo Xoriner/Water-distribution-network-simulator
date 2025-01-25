@@ -70,6 +70,7 @@ public class ControlCenterApp extends JFrame implements Observer {
         // Water Discharge input
         gbc.gridx = 0;
         gbc.gridy = 5;
+        gbc.gridwidth = 1;
         add(new JLabel("Water Discharge (m3/s):"), gbc);
         gbc.gridx = 1;
         waterDischargeField = new JTextField();
