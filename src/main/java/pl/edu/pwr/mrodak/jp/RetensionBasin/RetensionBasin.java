@@ -54,8 +54,8 @@ public class RetensionBasin extends Observable implements IRetensionBasin, TcpCo
         currentVolume += totalInflow - waterDischarge;
         if (currentVolume > maxVolume) {
             currentVolume = maxVolume;
-            //CHANGE THIS PROBABLY
             waterDischarge = totalInflow;
+            sendWaterDischargeToOutgoingSection();
         } else if (currentVolume < 0) {
             currentVolume = 0;
         }
